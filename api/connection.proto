@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package connection;
+package api.connection;
 
 message ConnectionRequest {
   // Campos que indican la solicitud de conexión

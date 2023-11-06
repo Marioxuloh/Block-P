@@ -1,4 +1,4 @@
-package server
+package server.connection
 
 // Importa los paquetes y definiciones necesarios.
 
