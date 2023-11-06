@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package api.connection;
+
+message ConnectionRequest {
+  // request connection
+  string node_id = 1; // Identificador único del nodo
+}
+
+message Acknowledge {
+  // accept connection
+  string message = 1; // Mensaje de confirmación
+}
+
+service ConnectionService {
+  // method for request connection
+  rpc RequestConnection (ConnectionRequest) returns (Acknowledge);
+  // method for accept connection
+  rpc SendAcknowledge (Acknowledge) returns (Acknowledge);
+}
