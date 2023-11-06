@@ -5,9 +5,9 @@ go.mod y go.sum: Estos archivos son parte del sistema de módulos de Go y se uti
 
 api/: En este directorio, puedes mantener tus archivos relacionados con los protocolos de gRPC.
 
-    mi_aplicacion.proto: Este archivo define los mensajes y servicios gRPC que se utilizarán en tu aplicación. Debes definir aquí los protocolos de comunicación entre el maestro y los esclavos.
+    servicio.proto: Este archivo define los mensajes y servicios gRPC que se utilizarán en tu aplicación. Debes definir aquí los protocolos de comunicación entre el maestro y los esclavos.
 
-    mi_aplicacion.pb.go y mi_aplicacion_grpc.pb.go: Estos archivos se generan automáticamente a partir del archivo .proto y contienen las definiciones de mensajes y servicios generados por el compilador de protoc.
+    servicio.pb.go y servicio_grpc.pb.go: Estos archivos se generan automáticamente a partir del archivo .proto y contienen las definiciones de mensajes y servicios generados por el compilador de protoc.
 
 cmd/: Este directorio contiene los programas principales de tu aplicación, como el servidor y el cliente.
 
