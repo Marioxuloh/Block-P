@@ -8,7 +8,7 @@ Este repositorio contiene la aplicación Block-P, diseñada para gestionar la co
 
 - **go.mod y go.sum**: Parte del sistema de módulos de Go, utilizados para gestionar las dependencias del proyecto.
 
-## estructura de mensajes gRPC
+## Estructura de mensajes gRPC
 
 El directorio `api/` contiene archivos relacionados con los protocolos de gRPC:
 
