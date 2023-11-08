@@ -26,7 +26,7 @@ Este directorio contiene los programas principales de la aplicación, como el se
 
 - **dashboard/**: Aquí se encuentra el código relacionado con el servicio web, como el dashboard. En esta carpeta, encontrarás:
 
-  - **vista/**: Implementa la lógica para establecer una conexión WebSocket con el servidor. El dashboard escucha los mensajes enviados por el servidor a través del WebSocket y actualiza la vista en tiempo real sin necesidad de recargar la página.
+  - **view/**: Implementa la lógica para establecer una conexión WebSocket con el servidor. El dashboard escucha los mensajes enviados por el servidor a través del WebSocket y actualiza la vista en tiempo real sin necesidad de recargar la página.
 
   - **controller/**: El controlador del servidor implementa la lógica para manejar los WebSockets. Esto incluye la gestión de conexiones WebSocket entrantes y el envío de mensajes a los clientes, como el dashboard. Cuando ocurre un evento que requiere una actualización en el dashboard, como la adición de un nuevo libro a la biblioteca, el controlador envía un mensaje a través del WebSocket a todos los clientes conectados.
 
