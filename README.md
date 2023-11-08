@@ -22,7 +22,7 @@ El directorio `api/` contiene archivos relacionados con los protocolos de gRPC:
 
 Este directorio contiene los programas principales de la aplicación, como el control por linea de comandos. También es el lugar donde se encuentra el código de la interfaz grafica de control:
 
-- **cli/**: Contiene el código relacionado con la línea de comandos en la aplicación.
+- **`cli/`**: Contiene el código relacionado con la línea de comandos en la aplicación.
 
 - **dashboard/**: Aquí se encuentra el código relacionado con el servicio web, como el dashboard. En esta carpeta, encontrarás:
 
