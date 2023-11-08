@@ -8,7 +8,7 @@ Este repositorio contiene la aplicación Block-P, diseñada para gestionar la co
 
 - **go.mod y go.sum**: Parte del sistema de módulos de Go, utilizados para gestionar las dependencias del proyecto.
 
-## Protocolos de gRPC
+## estructura de mensajes gRPC
 
 El directorio `api/` contiene archivos relacionados con los protocolos de gRPC:
 
@@ -18,7 +18,7 @@ El directorio `api/` contiene archivos relacionados con los protocolos de gRPC:
 
 ## Componentes de la Aplicación
 
-### Directorio cmd/
+### Directorio `cmd/`
 
 Este directorio contiene los programas principales de la aplicación, como el servidor y el cliente. También es el lugar donde se encuentra el código del dashboard:
 
@@ -30,7 +30,7 @@ Este directorio contiene los programas principales de la aplicación, como el se
 
   - **controller/**: El controlador del servidor implementa la lógica para manejar los WebSockets. Esto incluye la gestión de conexiones WebSocket entrantes y el envío de mensajes a los clientes, como el dashboard. Cuando ocurre un evento que requiere una actualización en el dashboard, como la adición de un nuevo libro a la biblioteca, el controlador envía un mensaje a través del WebSocket a todos los clientes conectados.
 
-### Directorio pkg/
+### Directorio `pkg/`
 
 Este directorio es adecuado para colocar código compartido entre el servidor y el cliente:
 
@@ -42,7 +42,7 @@ Este directorio es adecuado para colocar código compartido entre el servidor y 
 
 - **dao/**: El patrón DAO se utiliza para separar la lógica de negocio del acceso a datos y encapsular la interacción con la base de datos.
 
-## Directorio config/
+## Directorio `config/`
 
 Este directorio almacena archivos de configuración. El archivo `config.json` podría contener información sobre el rol del nodo (maestro o esclavo) y otras configuraciones necesarias.
 
