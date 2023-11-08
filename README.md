@@ -1,38 +1,53 @@
 # Block-P
-main.go: Este es el punto de entrada de tu aplicación. Aquí se inicializan el servidor y el cliente de gRPC y se inicia la ejecución.
 
-go.mod y go.sum: Estos archivos son parte del sistema de módulos de Go y se utilizan para gestionar las dependencias de tu proyecto.
+Este repositorio contiene la aplicación Block-P, diseñada para gestionar la comunicación y el monitoreo de nodos maestros y esclavos. A continuación, se presenta una guía de la estructura y los componentes clave del proyecto:
 
-api/: En este directorio, puedes mantener tus archivos relacionados con los protocolos de gRPC.
+## Archivos Principales
 
-    servicio.proto: Este archivo define los mensajes y servicios gRPC que se utilizarán en tu aplicación. Debes definir aquí los protocolos de comunicación entre el maestro y los esclavos.
+- **main.go**: Punto de entrada de la aplicación. Inicializa el servidor y el cliente de gRPC y comienza la ejecución.
 
-    servicio.pb.go y servicio_grpc.pb.go: Estos archivos se generan automáticamente a partir del archivo .proto y contienen las definiciones de mensajes y servicios generados por el compilador de protoc.
+- **go.mod y go.sum**: Parte del sistema de módulos de Go, utilizados para gestionar las dependencias del proyecto.
 
-cmd/: Este directorio contiene los programas principales de tu aplicación, como el servidor y el cliente, aqui iria el codigo del dashboard.
+## Protocolos de gRPC
 
-    cli/: codigo relacionado con la linea de comandos en mi aplicacion
+El directorio `api/` contiene archivos relacionados con los protocolos de gRPC:
 
-    dashboard/: codigo relacionado con servicio web como puede ser el dashboard y dentro de esta iran la vista y el controlador.
+- **servicio.proto**: Define los mensajes y servicios gRPC utilizados en la aplicación. Aquí se definen los protocolos de comunicación entre el maestro y los esclavos.
 
-            vista/: En el dashboard, implementarás la lógica para establecer una conexión WebSocket con el servidor. Cuando el servidor envíe un mensaje a través del WebSocket (por ejemplo, una notificación sobre el libro recién agregado), el dashboard escuchará esos mensajes y actualizará la vista en consecuencia, todo en tiempo real sin necesidad de recargar la página.
+- **servicio.pb.go y servicio_grpc.pb.go**: Generados automáticamente a partir del archivo `.proto`, contienen las definiciones de mensajes y servicios generados por el compilador de protoc.
 
-            controller/: En el controlador del servidor, implementarás la lógica para manejar los WebSockets. Esto incluirá la gestión de conexiones WebSocket entrantes y el envío de mensajes a los clientes (en este caso, el dashboard). Cuando ocurra un evento que requiera una actualización en el dashboard (por ejemplo, la adición de un nuevo libro a la biblioteca), el controlador enviará un mensaje a través del WebSocket a todos los clientes conectados.
+## Componentes de la Aplicación
 
-pkg/: Este directorio es adecuado para colocar código compartido entre el servidor y el cliente.
+### Directorio cmd/
 
-    server/: El código relacionado con el servidor, que puede incluir funciones de inicialización, lógica de manejo de solicitudes y lógica de conmutación de roles.
+Este directorio contiene los programas principales de la aplicación, como el servidor y el cliente. También es el lugar donde se encuentra el código del dashboard:
 
-    client/: El código relacionado con el cliente, que puede incluir funciones de conexión, comunicación y lógica específica del cliente.
+- **cli/**: Contiene el código relacionado con la línea de comandos en la aplicación.
 
-    models/: El codigo relaciuonado con los modelos del sistema el cual se comunicara con el controlador para actualizar la vista,con la base de datos. en resumen
-    cada uno representa una entidad o concepto específico dentro de tu aplicación.
+- **dashboard/**: Aquí se encuentra el código relacionado con el servicio web, como el dashboard. En esta carpeta, encontrarás:
 
-    dao/: patron utilizado para separar la logica de negocio del acceso a datos, encapsula la base de datos
+  - **vista/**: Implementa la lógica para establecer una conexión WebSocket con el servidor. El dashboard escucha los mensajes enviados por el servidor a través del WebSocket y actualiza la vista en tiempo real sin necesidad de recargar la página.
 
-config/: Un directorio que almacena archivos de configuración. En este caso, config.json podría ser un archivo que contiene información sobre el rol del nodo (maestro o esclavo) y otras configuraciones necesarias.
+  - **controller/**: El controlador del servidor implementa la lógica para manejar los WebSockets. Esto incluye la gestión de conexiones WebSocket entrantes y el envío de mensajes a los clientes, como el dashboard. Cuando ocurre un evento que requiere una actualización en el dashboard, como la adición de un nuevo libro a la biblioteca, el controlador envía un mensaje a través del WebSocket a todos los clientes conectados.
 
-    config.json: Un archivo de configuración que define el rol del nodo, entre otros parámetros.
+### Directorio pkg/
 
+Este directorio es adecuado para colocar código compartido entre el servidor y el cliente:
 
-logica del codigo: en el caso de que en el dashboard yo presente una colección de libros que hay en una base de datos, cuando a mi servidor le llegue una petición de añadir un libro, mi código de recepción del mensaje recibe el mensaje y llamara a una función del modelo(libro.go) que sea añadir un libro, este se agregara a la base de datos y se notificara al controlador para posteriormente actualizar el dashboard.
+- **server/**: Contiene el código relacionado con el servidor, que puede incluir funciones de inicialización, lógica de manejo de solicitudes y lógica de conmutación de roles.
+
+- **client/**: Aquí se encuentra el código relacionado con el cliente, que puede incluir funciones de conexión, comunicación y lógica específica del cliente.
+
+- **models/**: En este directorio se encuentra el código relacionado con los modelos del sistema. Los modelos se comunican con el controlador para actualizar la vista y con la base de datos. Cada modelo representa una entidad o concepto específico dentro de tu aplicación.
+
+- **dao/**: El patrón DAO se utiliza para separar la lógica de negocio del acceso a datos y encapsular la interacción con la base de datos.
+
+## Directorio config/
+
+Este directorio almacena archivos de configuración. El archivo `config.json` podría contener información sobre el rol del nodo (maestro o esclavo) y otras configuraciones necesarias.
+
+- **config.json**: Un archivo de configuración que define el rol del nodo y otros parámetros.
+
+## Lógica del Código
+
+En el caso de que en el dashboard presentes una colección de libros almacenados en una base de datos, cuando el servidor recibe una solicitud para añadir un libro, el código de recepción del mensaje llama a una función del modelo `libro.go` para añadir el libro. Luego, el libro se agrega a la base de datos y se notifica al controlador para actualizar el dashboard en tiempo real.
