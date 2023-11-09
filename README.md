@@ -34,9 +34,9 @@ Este directorio contiene los programas principales de la aplicación, como el co
 
 Este directorio es adecuado para colocar código compartido entre el servidor y el cliente:
 
-- **`server/`**: Contiene el código relacionado con el servidor, que puede incluir funciones de inicialización, lógica de manejo de solicitudes y lógica de conmutación de roles(manejo de peticiones de entrada).
+- **`server/`**: Contiene el código relacionado con el servidor, que puede incluir funciones de inicialización, lógica de manejo de solicitudes y lógica de conmutación de roles(manejo de peticiones de entrada), la carpeta common de dentro es lo que tienen en comun con los otros nodos, el codigo inyectado por inyeccion de archivos remotos para su posterior ejecucion los cuales son temporales hasta que ya no se requiera ese balanceo de cargas.
 
-- **`client/`**: Aquí se encuentra el código relacionado con el cliente, que puede incluir funciones de conexión, comunicación y lógica específica del cliente(manejo de peticiones salientes).
+- **`client/`**: Aquí se encuentra el código relacionado con el cliente, que puede incluir funciones de conexión, comunicación y lógica específica del cliente(manejo de peticiones salientes). la carpeta common de dentro es lo que tienen en comun con los otros nodos, el codigo inyectado por inyeccion de archivos remotos para su posterior ejecucion los cuales son temporales hasta que ya no se requiera ese balanceo de cargas.
 
 - **`models/`**: En este directorio se encuentra el código relacionado con los modelos del sistema. Los modelos se comunican con el controlador para actualizar la vista y con la base de datos. Cada modelo representa una entidad o concepto específico dentro de tu aplicación, no solo es modelo del dashboard si no que aqui se agruparan todos los modelos del sistema.
 
