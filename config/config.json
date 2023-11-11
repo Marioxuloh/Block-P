@@ -2,5 +2,6 @@
     "port": 8080,
     "protocol": "tcp",
     "maxConnections": 100,
-    "debugMode": true
+    "debugMode": true,
+    "id": 70913738
 }

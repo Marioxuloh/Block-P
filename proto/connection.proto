@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "./proto";
+
+package proto.connection;
+
+message ConnectionRequest {};//agregar campo id para que cuando se envie la request conectiopn se sepa de donde ha venido
+
+message Acknowledge {
+  string message = 1;
+}
+
+service ConnectionService {
+  rpc RequestConnection (ConnectionRequest) returns (Acknowledge);
+}
