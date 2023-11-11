@@ -4,10 +4,13 @@ option go_package = "./proto";
 
 package proto.connection;
 
-message ConnectionRequest {};//agregar campo id para que cuando se envie la request conectiopn se sepa de donde ha venido
+message ConnectionRequest {
+  int64 id = 1;
+};
 
 message Acknowledge {
-  string message = 1;
+  int64 id = 1;
+  string message = 2;
 }
 
 service ConnectionService {

@@ -3,5 +3,5 @@
     "protocol": "tcp",
     "maxConnections": 100,
     "debugMode": true,
-    "id": 70913738
+    "id": 0
 }

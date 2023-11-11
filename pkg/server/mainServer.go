@@ -18,7 +18,10 @@ type Config struct {
 	Protocol       string `json:"protocol"`
 	MaxConnections int    `json:"maxConnections"`
 	DebugMode      bool   `json:"debugMode"`
+	Id             int    `json:"id"`
 }
+
+var config Config
 
 type connectionServer struct {
 	pb.ConnectionServiceServer
@@ -34,7 +37,6 @@ func main() {
 	}
 	defer configFile.Close()
 
-	var config Config
 	decoder := json.NewDecoder(configFile)
 	err = decoder.Decode(&config)
 	if err != nil {

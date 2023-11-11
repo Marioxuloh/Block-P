@@ -2,18 +2,26 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"sync"
 	"syscall"
 	"time"
-
-	pb "Block-P/proto" // pakages generated with .proto
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	// pakages generated with .proto
 )
+
+type Config struct {
+	Port           int    `json:"port"`
+	Protocol       string `json:"protocol"`
+	MaxConnections int    `json:"maxConnections"`
+	DebugMode      bool   `json:"debugMode"`
+	Id             int    `json:"id"`
+}
+
+var config Config
 
 const (
 	callInterval = 10 * time.Second
@@ -27,6 +35,20 @@ func main() {
 	// Configurar el manejador de señales para manejar Ctrl+C
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM) //señales SIGINT(os.Interrupt) y SIGTERM(syscall.SIGTERM)
+
+	// Read config.json
+	configPath := filepath.Join("..", "..", "config", "config.json")
+	configFile, err := os.Open(configPath)
+	if err != nil {
+		log.Fatalf("Failed to open config file: %v", err)
+	}
+	defer configFile.Close()
+
+	decoder := json.NewDecoder(configFile)
+	err = decoder.Decode(&config)
+	if err != nil {
+		log.Fatalf("Failed to decode config file: %v", err)
+	}
 
 	// Lista de direcciones de nodos
 	nodeAddresses := []string{"localhost:8080", "localhost:8080",
@@ -63,25 +85,4 @@ func main() {
 		wg.Wait()
 
 	}
-}
-
-func runNodeCheck(ctx context.Context, nodeAddress string) {
-
-	select {
-	case <-ctx.Done():
-		log.Println("Graceful shutdown requested. Exiting runNodeCheck...")
-		return
-	default:
-		conn, err := grpc.Dial(nodeAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
-		if err != nil {
-			log.Printf("could not connect to %s: %v", nodeAddress, err)
-			return
-		}
-		defer conn.Close()
-
-		client := pb.NewConnectionServiceClient(conn)
-
-		callConnection(client)
-	}
-
 }

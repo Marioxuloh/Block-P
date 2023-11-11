@@ -7,8 +7,10 @@ import (
 )
 
 func (c *connectionServer) RequestConnection(ctx context.Context, req *pb.ConnectionRequest) (*pb.Acknowledge, error) {
-	log.Printf("RequestConnection received")
+	log.Printf("ConnectionRequest received from nodeID: %v", req.Id)
+
 	return &pb.Acknowledge{
+		Id:      int64(config.Id),
 		Message: "ack",
 	}, nil
 }
