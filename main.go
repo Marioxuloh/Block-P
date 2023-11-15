@@ -1,4 +1,6 @@
-package main
+package main //para hacer el ejecutable hay que utilizar filepath.Abs y entregarlo con
+// las dependencias las cuales son todo codigo ajeno a .go, como la plantilla html, el archivo config.json
+// hay que cambiar en todos los sitios donde obtenemos estas dependencias de forma normal a ruta absoluta (de forma dinamica obviamente xddd)
 
 import (
 	"encoding/json"
