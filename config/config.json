@@ -1,7 +1,10 @@
 {
     "port": 8080,
+    "dashPort": 8081,
     "protocol": "tcp",
     "maxConnections": 100,
     "debugMode": true,
-    "id": 0
+    "id": 0,
+    "mode": true,
+    "callInterval": 10
 }

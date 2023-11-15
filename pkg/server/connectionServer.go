@@ -1,4 +1,4 @@
-package main
+package Server
 
 import (
 	pb "Block-P/proto" // pakages generated with .proto
@@ -7,10 +7,10 @@ import (
 )
 
 func (c *connectionServer) RequestConnection(ctx context.Context, req *pb.ConnectionRequest) (*pb.Acknowledge, error) {
-	log.Printf("ConnectionRequest received from nodeID: %v", req.Id)
+	log.Printf("Server: ConnectionRequest received from nodeID: %v", req.Id)
 
 	return &pb.Acknowledge{
-		Id:      int64(config.Id),
+		Id:      int64(id),
 		Message: "ack",
 	}, nil
 }

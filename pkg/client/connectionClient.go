@@ -1,46 +1,50 @@
-package main
+package Client
 
 import (
 	"context"
 	"log"
 	"time"
 
+	models "Block-P/pkg/models"
 	pb "Block-P/proto" // pakages generated with .proto
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func runNodeCheck(ctx context.Context, nodeAddress string) {
+func runNodeCheck(ctx context.Context, nodeAddress string, id int) {
 
 	select {
 	case <-ctx.Done():
-		log.Println("Graceful shutdown requested. Exiting runNodeCheck...")
+		log.Println("Client: Graceful shutdown requested. Exiting runNodeCheck...")
 		return
 	default:
 		conn, err := grpc.Dial(nodeAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
-			log.Printf("could not connect to %s: %v", nodeAddress, err)
-			return
+			log.Printf("client could not connect to %s: %v", nodeAddress, err)
 		}
 		defer conn.Close()
 
 		client := pb.NewConnectionServiceClient(conn)
 
-		callConnection(client)
-	}
+		connected := callConnection(client, id)
 
-	//actualizar estado del nodo en la base de datos para que se vea reflejado en el dashboard
+		models.UpdateDatabaseConnected(nodeAddress, connected)
+
+	}
 
 }
 
-func callConnection(client pb.ConnectionServiceClient) {
+func callConnection(client pb.ConnectionServiceClient, id int) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	res, err := client.RequestConnection(ctx, &pb.ConnectionRequest{Id: int64(config.Id)})
+	res, err := client.RequestConnection(ctx, &pb.ConnectionRequest{Id: int64(id)})
 	if err != nil {
-		log.Fatalf("could not connect: %v", err)
+		return false
 	}
-	log.Printf("Acknowledge received from nodeID: %v message: %s", res.Id, res.Message)
+	log.Printf("Client: Acknowledge response from Id: %v message: %s", res.Id, res.Message)
+
+	return true
+
 }

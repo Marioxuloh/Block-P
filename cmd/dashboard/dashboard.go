@@ -1,4 +1,4 @@
-package main
+package Dashboard
 
 import (
 	"Block-P/cmd/dashboard/controllers"
@@ -7,10 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
+func Dashboard(address string) {
 	router := gin.Default()
 
-	router.Static("/dashboard", "./view")
+	router.Static("/dashboard", "./cmd/dashboard/view")
 
 	// Configurar rutas
 	router.GET("/", func(c *gin.Context) {
@@ -22,5 +22,5 @@ func main() {
 	router.GET("/ws", wsController.HandleWebSocket)
 	router.GET("/send-message", wsController.SendMessage)
 
-	router.Run(":8080")
+	router.Run(address)
 }
