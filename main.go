@@ -47,7 +47,7 @@ func main() {
 	var wg sync.WaitGroup
 
 	// Read config.json
-	configPath := filepath.Join("config", "config.json")
+	configPath := filepath.Join("config.json")
 	configFile, err := os.Open(configPath)
 	if err != nil {
 		log.Fatalf("Failed to open config file: %v", err)
