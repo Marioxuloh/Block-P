@@ -28,6 +28,9 @@ type Config struct {
 	Id             int           `json:"id"`
 	MasterMode     bool          `json:"masterMode"` //tener en cuenta si es master o no que demomento no lo has tenido en cuenta en el codigo
 	CallInterval   time.Duration `json:"callInterval"`
+	Secure         bool          `json:"secure"`
+	//tener en cuenta que para que haya conexion segura debe haber un certificado de CA autorizada
+	//y el cliente envia su certificacion y key publica y esto se verifica desde el servidor
 }
 
 //server
