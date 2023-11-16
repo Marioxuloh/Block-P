@@ -26,7 +26,7 @@ type Config struct {
 	MaxConnections int           `json:"maxConnections"`
 	DebugMode      bool          `json:"debugMode"`
 	Id             int           `json:"id"`
-	Mode           bool          `json:"mode"` //tener en cuenta si es master o no que demomento no lo has tenido en cuenta en el codigo
+	MasterMode     bool          `json:"masterMode"` //tener en cuenta si es master o no que demomento no lo has tenido en cuenta en el codigo
 	CallInterval   time.Duration `json:"callInterval"`
 }
 
