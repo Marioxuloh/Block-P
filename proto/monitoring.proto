@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "./proto";
+
+package proto.monitoring;
+
+message MonitoringRequest {
+  int64 id = 1;
+};
+
+message Data {
+  int64 id = 1;
+  map<string, string> metrics = 2;
+}
+
+service MonitoringService {
+  rpc RequestMonitoring (MonitoringRequest) returns (stream Data);
+};
