@@ -50,4 +50,7 @@ Este directorio almacena archivos de configuración. El archivo `config.json` po
 
 ## Lógica del Código
 
-En el caso de que en el dashboard presentes una colección de libros almacenados en una base de datos, cuando el servidor recibe una solicitud para añadir un libro, el código de recepción del mensaje llama a una función del modelo `libro.go` para añadir el libro. Luego, el libro se agrega a la base de datos y se notifica al controlador para actualizar el dashboard en tiempo real.
+El cliente inicia una conexión al servidor mediante el método RequestMonitoring.
+El servidor responde con un flujo (stream) que se mantiene abierto.
+El servidor puede enviar actualizaciones a través del flujo a intervalos regulares o en respuesta a eventos específicos.
+El cliente procesa las actualizaciones a medida que llegan y puede realizar acciones en tiempo real, como actualizar un dashboard o almacenar métricas en una base de datos.
