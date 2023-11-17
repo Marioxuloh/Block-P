@@ -29,7 +29,8 @@ func runNodeCheck(ctx context.Context, nodeAddress string, id int) {
 
 		connected := callConnection(client, id)
 
-		models.UpdateDatabaseConnected(nodeAddress, connected)
+		models.UpdateDatabaseConnected(nodeAddress, connected) //podria cambiarlo y pasarle al mainclient un map querelacione nodo
+		//y estado para hacer 1 sola escritura de todos los estados a la vez
 
 	}
 

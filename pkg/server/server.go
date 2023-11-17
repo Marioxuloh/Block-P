@@ -15,6 +15,10 @@ type connectionServer struct {
 	pb.ConnectionServiceServer
 }
 
+type metricsServer struct {
+	pb.MetricServiceServer
+}
+
 func Server(protocol string, address string, nodeID int) {
 
 	id = nodeID
@@ -26,6 +30,7 @@ func Server(protocol string, address string, nodeID int) {
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterConnectionServiceServer(grpcServer, &connectionServer{})
+	//pb.RegisterMetricServiceServer(grpcServer, metricsServer{})
 	log.Printf("server started at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to start the server: %v", err)
