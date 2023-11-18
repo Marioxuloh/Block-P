@@ -53,6 +53,7 @@ func Client(callInterval time.Duration, id int) {
 			go func(addr string) {
 				defer wg.Done()
 				runNodeCheck(ctx, addr, id)
+				runNodeMetrics(ctx, addr, id)
 			}(addr)
 		}
 

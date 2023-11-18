@@ -30,7 +30,7 @@ func runNodeCheck(ctx context.Context, nodeAddress string, id int) {
 		connected := callConnection(client, id)
 
 		models.UpdateDatabaseConnected(nodeAddress, connected) //podria cambiarlo y pasarle al mainclient un map querelacione nodo
-		//y estado para hacer 1 sola escritura de todos los estados a la vez
+		//y estado para hacer 1 sola escritura de todos los estados a la vez, tambien manda la info al socket del controller
 
 	}
 
@@ -42,6 +42,7 @@ func callConnection(client pb.ConnectionServiceClient, id int) bool {
 
 	res, err := client.RequestConnection(ctx, &pb.ConnectionRequest{Id: int64(id)})
 	if err != nil {
+		log.Printf("Error making RequestConnection call: %v", err)
 		return false
 	}
 	log.Printf("Client: Acknowledge response from Id: %v message: %s", res.Id, res.Message)

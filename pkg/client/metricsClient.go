@@ -4,6 +4,7 @@ import (
 	models "Block-P/pkg/models"
 	pb "Block-P/proto"
 	"context"
+	"io"
 	"log"
 	"time"
 
@@ -27,8 +28,7 @@ func runNodeMetrics(ctx context.Context, nodeAddress string, id int) {
 
 		metrics := callMetrics(client, id)
 
-		models.UpdateDatabaseMetrics(nodeAddress, metrics) //podria cambiarlo y pasarle al mainclient un map querelacione nodo
-		//y estado para hacer 1 sola escritura de todos los estados a la vez
+		models.UpdateDatabaseMetrics(nodeAddress, metrics) //aqui hacemos update de las metricas y mandamos la informacion al sockets del controller
 
 	}
 }
@@ -38,11 +38,30 @@ func callMetrics(client pb.MetricServiceClient, id int) (metrics map[string]stri
 
 	defer cancel()
 
-	res, err := client.RequestMetrics(ctx, &pb.MetricsRequest{Id: int64(id)})
+	metrics = make(map[string]string)
+
+	stream, err := client.RequestMetrics(ctx, &pb.MetricsRequest{Id: int64(id)})
 	if err != nil {
+		log.Printf("Error making RequestMetrics call: %v", err)
 		return nil
 	}
-	log.Printf("Client: Data response from Id: %v", res)
+
+	for {
+		data, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Printf("client could not Recv, error while streaming: %v", err)
+			return nil
+		}
+
+		for key, value := range data.Metrics {
+			metrics[key] = value
+		}
+	}
+	log.Printf("Client: received a data: %v", metrics)
+	log.Printf("Client: Streaming finished")
 
 	return metrics
 

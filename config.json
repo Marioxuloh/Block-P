@@ -6,6 +6,6 @@
     "debugMode": true,
     "id": 0,
     "masterMode": true,
-    "callInterval": 10,
+    "callInterval": 1,
     "secure": false
 }
