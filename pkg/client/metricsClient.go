@@ -61,7 +61,8 @@ func callMetrics(client pb.MetricServiceClient, id int) (metrics map[string]stri
 		}
 	}
 	log.Printf("Client: received a data: %v", metrics)
-	//log.Printf("Client: Streaming finished")
+	//por cada grupo de metricas recibido cada cierto tiempo se actualizara la base de datos para tener un registro de el servidor
+	log.Printf("Client: Streaming finished")
 
 	return metrics
 
