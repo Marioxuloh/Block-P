@@ -25,15 +25,19 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 	}
 	mem, err := getMEM()
 	if err != nil {
-		log.Printf("Error getting CPU usage: %v", err)
+		log.Printf("Error getting MEM usage: %v", err)
 		mem = "N/A"
+	}
+	disk, err := getDISK()
+	if err != nil {
+		log.Printf("Error getting DISK usage: %v", err)
+		disk = "N/A"
 	}
 
 	metrics := map[string]string{
 		"cpu":           cpu,
 		"mem":           mem,
-		"ram":           "60",
-		"disk":          "80",
+		"disk":          disk,
 		"network":       "1000",
 		"response_time": "50",
 	}
