@@ -35,11 +35,9 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 	}
 
 	metrics := map[string]string{
-		"cpu":           cpu,
-		"mem":           mem,
-		"disk":          disk,
-		"network":       "1000",
-		"response_time": "50",
+		"cpu":  cpu,
+		"mem":  mem,
+		"disk": disk,
 	}
 
 	for metricName, metricValue := range metrics {

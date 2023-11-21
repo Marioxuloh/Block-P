@@ -61,7 +61,7 @@ func callMetrics(client pb.MetricServiceClient, id int) (metrics map[string]stri
 		}
 	}
 	log.Printf("Client: received a data: %v", metrics)
-	log.Printf("Client: Streaming finished")
+	//log.Printf("Client: Streaming finished")
 
 	return metrics
 
