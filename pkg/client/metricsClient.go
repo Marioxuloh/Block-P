@@ -13,6 +13,9 @@ import (
 )
 
 func runNodeMetrics(ctx context.Context, nodeAddress string, id int) {
+	//por cada grupo de metricas recibido cada cierto tiempo se actualizara la base de datos para tener un registro de el servidor
+	//hay que tener en cuenta que en call metrics se va a quedar un proceso un tiempo infinito recibiendo cosas del servidor
+	//asique la actualizacion de la base de datos se haria ahi, o simplemente hacerlo todo junto en runnodemetrics y ya.
 	select {
 	case <-ctx.Done():
 		log.Println("Client: Graceful shutdown requested. Exiting runNodeCheck...")
@@ -61,7 +64,6 @@ func callMetrics(client pb.MetricServiceClient, id int) (metrics map[string]stri
 		}
 	}
 	log.Printf("Client: received a data: %v", metrics)
-	//por cada grupo de metricas recibido cada cierto tiempo se actualizara la base de datos para tener un registro de el servidor
 	log.Printf("Client: Streaming finished")
 
 	return metrics
