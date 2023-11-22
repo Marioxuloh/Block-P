@@ -45,7 +45,7 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 		"mem":  mem,
 		"disk": disk,
 	}
-
+	//aqui mandar directamente el map de metrics
 	for metricName, metricValue := range metrics {
 		response := &pb.Data{
 			Id:      int64(Id),
