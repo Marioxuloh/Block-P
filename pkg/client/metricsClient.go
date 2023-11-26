@@ -82,6 +82,7 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) erro
 			// ahi ya calcular que si recibimos un mensaje cada 1/4 de segundo cuantos mensajes hay que no guardar y cual si
 		}
 	}()
+
 	for {
 		// Comprueba si el temporizador ha caducado
 		select {
