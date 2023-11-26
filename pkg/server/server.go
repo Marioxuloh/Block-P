@@ -28,7 +28,7 @@ func Server(protocol string, address string, nodeID int) {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterConnectionServiceServer(grpcServer, &connectionServer{})
+	//pb.RegisterConnectionServiceServer(grpcServer, &connectionServer{})
 	pb.RegisterMetricServiceServer(grpcServer, metrics.InitMetricsServer())
 	log.Printf("server started at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {

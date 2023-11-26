@@ -70,6 +70,8 @@ func main() {
 
 	//servidor
 
+	config.CallInterval = config.CallInterval * time.Second
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -77,8 +79,6 @@ func main() {
 	}()
 
 	//cliente
-
-	config.CallInterval = config.CallInterval * time.Second
 
 	wg.Add(1)
 	go func() {
