@@ -68,7 +68,7 @@ func main() {
 	address = ":" + strconv.Itoa(config.Port)
 	dashAddress = ":" + strconv.Itoa(config.DashPort)
 
-	//servidor
+	//servidor, gestionamos todas las llamadas entrantes
 
 	config.CallInterval = config.CallInterval * time.Second
 
@@ -78,7 +78,7 @@ func main() {
 		server.Server(config.Protocol, address, config.Id)
 	}()
 
-	//cliente
+	//cliente, gestionamos todos los mensajes que vamos a enviar: requestMetrics()
 
 	wg.Add(1)
 	go func() {
@@ -86,7 +86,7 @@ func main() {
 		client.Client(config.CallInterval, config.Id)
 	}()
 
-	//dashboard
+	//dashboard, desplegamos unh dashboard para visualizar los nodos, su informacion y poder inyectar codigo en ellos para utilizarlos como microservicios
 
 	wg.Add(1)
 	go func() {
