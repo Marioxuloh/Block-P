@@ -43,7 +43,7 @@ func runNodeMetrics(ctx context.Context, nodeAddress string, id int) {
 
 func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) error {
 
-	response := true
+	var response error
 
 	timeout := 10 * time.Second
 
@@ -65,12 +65,12 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) erro
 			data, err := stream.Recv()
 			if err == io.EOF {
 				log.Printf("Client: End Of File detected, closing streaming in timeout: %d err: %v", timeout, err)
-				response = false
+				response = nil
 				break
 			}
 			if err != nil {
 				log.Printf("Client: could not Recv, error while streaming, retrying connect in timeout: %d err: %v", timeout, err)
-				response = true
+				response = err
 				break
 			}
 			for key, value := range data.Metrics {
@@ -86,12 +86,12 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) erro
 		// Comprueba si el temporizador ha caducado
 		select {
 		case <-timer.C:
-			if response == false {
+			if response == nil {
 				log.Printf("Client: closing streaming, Timeout expired on node: %v", nodeAddress) //el servidor ha mandado un eof y cerramos streaming
-				return nil
+				return response
 			} else {
 				log.Printf("Client: retrying to connect, Timeout expired on node: %v", nodeAddress) //fallo de conexion, se reintenta conectar
-				return ctx.Err()
+				return response
 			}
 
 		default:
