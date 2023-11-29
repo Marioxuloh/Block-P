@@ -9,27 +9,20 @@ import (
 	"syscall"
 )
 
-type Config struct {
-	Port           int    `json:"port"`
-	Protocol       string `json:"protocol"`
-	MaxConnections int    `json:"maxConnections"`
-	DebugMode      bool   `json:"debugMode"`
-	Id             int    `json:"id"`
+// Node
+type Node struct {
+	Name string
+	Addr string
 }
-
-//var config Config
 
 var (
 	shutdownRequested = false
 )
 
-func Client(id int) {
+func Client(nodes []Node, id int) {
 	// Configurar el manejador de señales para manejar Ctrl+C
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM) //señales SIGINT(os.Interrupt) y SIGTERM(syscall.SIGTERM)
-
-	// Lista de direcciones de nodos
-	nodeAddresses := []string{"localhost:8080"}
 
 	// Configurar contexto para el cierre ordenado
 	ctx, cancel := context.WithCancel(context.Background())
@@ -45,13 +38,12 @@ func Client(id int) {
 
 	var wg sync.WaitGroup
 
-	for _, addr := range nodeAddresses {
+	for _, Node := range nodes {
 		wg.Add(1)
-		go func(addr string) {
+		go func(addr string, name string) {
 			defer wg.Done()
-			//runNodeCheck(ctx, addr, id)
-			runNodeMetrics(ctx, addr, id)
-		}(addr)
+			runNodeMetrics(ctx, addr, name, id)
+		}(Node.Addr, Node.Name)
 	}
 
 	wg.Wait()

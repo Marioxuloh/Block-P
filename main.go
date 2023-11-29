@@ -27,13 +27,7 @@ type Config struct {
 	ID             int
 	MasterMode     bool
 	Secure         bool
-	Nodes          []Node
-}
-
-// Node estructura para almacenar información de un nodo
-type Node struct {
-	Name string
-	Addr string
+	Nodes          []client.Node
 }
 
 var address string
@@ -109,7 +103,7 @@ func main() {
 					// Asignar el valor correspondiente a la estructura Node
 					nodeName := key
 					nodeAddr := value
-					config.Nodes = append(config.Nodes, Node{Name: nodeName, Addr: nodeAddr})
+					config.Nodes = append(config.Nodes, client.Node{Name: nodeName, Addr: nodeAddr})
 				}
 			}
 		}
@@ -137,7 +131,7 @@ func main() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		client.Client(config.ID)
+		client.Client(config.Nodes, config.ID)
 	}()
 
 	//dashboard, desplegamos unh dashboard para visualizar los nodos, su informacion y poder inyectar codigo en ellos para utilizarlos como microservicios
