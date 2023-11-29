@@ -45,7 +45,7 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) erro
 
 	var response error
 
-	timeout := 10 * time.Second
+	timeout := 13 * time.Second //fibonacci
 
 	timer := time.NewTimer(timeout)
 
@@ -78,13 +78,11 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) erro
 			}
 			timer = time.NewTimer(timeout)
 			log.Printf("Client: received a data: %v", metrics)
-			models.UpdateDatabaseMetrics(nodeAddress, metrics) //que las metricas del log se actualicen cada mucho mas tiempo para no saturar, guardarlas cada 5 segundos,
-			// ahi ya calcular que si recibimos un mensaje cada 1/4 de segundo cuantos mensajes hay que no guardar y cual si
+			models.UpdateDatabaseMetrics(nodeAddress, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log
 		}
 	}()
 
 	for {
-		// Comprueba si el temporizador ha caducado
 		select {
 		case <-timer.C:
 			if response == nil {
@@ -94,9 +92,7 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) erro
 				log.Printf("Client: retrying to connect, Timeout expired on node: %v", nodeAddress) //fallo de conexion, se reintenta conectar
 				return response
 			}
-
 		default:
 		}
 	}
-
 }
