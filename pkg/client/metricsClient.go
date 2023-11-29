@@ -31,7 +31,7 @@ func runNodeMetrics(ctx context.Context, nodeAddress string, name string, id int
 
 			client := pb.NewMetricServiceClient(conn)
 
-			metrics := callMetrics(client, id, nodeAddress)
+			metrics := callMetrics(client, id, nodeAddress, name)
 
 			conn.Close()
 
@@ -43,7 +43,7 @@ func runNodeMetrics(ctx context.Context, nodeAddress string, name string, id int
 	}
 }
 
-func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) error {
+func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string, name string) error {
 
 	var response error
 
@@ -58,8 +58,8 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) erro
 
 	stream, err := client.RequestMetrics(ctx, &pb.MetricsRequest{Id: int64(id)})
 	if err != nil {
-		log.Printf("Error making RequestMetrics call: %v", err)
-		return err //volvemos a atras y seguimos intentando conectar
+		log.Printf("Error making RequestMetrics call to %v: %v", name, err)
+		return err //volvemos a atras y seguimos intentando conectar pasados 3s
 	}
 
 	go func() {
@@ -72,14 +72,14 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string) erro
 			}
 			if err != nil {
 				log.Printf("Client: could not Recv, error while streaming, retrying connect in timeout: %d err: %v", timeout, err)
-				response = err //salimos y volvemos a intentar conectar
+				response = err //salimos y volvemos a intentar conectar pasados 13s
 				break
 			}
 			for key, value := range data.Metrics {
 				metrics[key] = value
 			}
 			timer = time.NewTimer(timeout)
-			log.Printf("Client: received a data: %v", metrics)
+			log.Printf("Client: received a data from %v: %v", name, metrics)
 			models.UpdateDatabaseMetrics(nodeAddress, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log
 		}
 	}()

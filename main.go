@@ -126,22 +126,21 @@ func main() {
 		server.Server(config.Protocol, address, config.ID)
 	}()
 
-	//cliente, gestionamos todos los mensajes que vamos a enviar: requestMetrics()
+	if config.MasterMode == true {
+		//cliente, gestionamos todos los mensajes que vamos a enviar: requestMetrics(), demomento solo para master
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			client.Client(config.Nodes, config.ID)
+		}()
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		client.Client(config.Nodes, config.ID)
-	}()
-
-	//dashboard, desplegamos unh dashboard para visualizar los nodos, su informacion y poder inyectar codigo en ellos para utilizarlos como microservicios
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		dashboard.Dashboard(dashAddress)
-	}()
-
+		//dashboard, desplegamos unh dashboard para visualizar los nodos, su informacion y poder inyectar codigo en ellos para utilizarlos como microservicios, solo para master
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			dashboard.Dashboard(dashAddress)
+		}()
+	}
 	//cierre ordenado
 	go func() {
 		// Esperar señales
