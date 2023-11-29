@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
-	"time"
 )
 
 type Config struct {
@@ -24,7 +23,7 @@ var (
 	shutdownRequested = false
 )
 
-func Client(callInterval time.Duration, id int) {
+func Client(id int) {
 	// Configurar el manejador de señales para manejar Ctrl+C
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM) //señales SIGINT(os.Interrupt) y SIGTERM(syscall.SIGTERM)
@@ -55,7 +54,6 @@ func Client(callInterval time.Duration, id int) {
 		}(addr)
 	}
 
-	time.Sleep(callInterval)
 	wg.Wait()
 
 }
