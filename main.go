@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -45,8 +46,72 @@ func main() {
 	//cierre ordenado
 	var wg sync.WaitGroup
 
+	// Obtener el directorio de configuración del usuario
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		fmt.Println("Error al buscar archivos de configuracion:", err)
+		return
+	}
+
+	// Crear la ruta completa del directorio de configuración
+	configDirPath := filepath.Join(homeDir, ".config", "block-p")
+
+	// Verificar si el directorio de configuración existe
+	if _, err := os.Stat(configDirPath); os.IsNotExist(err) {
+		// Si no existe, crear el directorio
+		err := os.MkdirAll(configDirPath, 0755)
+		if err != nil {
+			fmt.Println("Error al crear el directorio de configuración:", err)
+			return
+		}
+
+		fmt.Printf("Se ha creado el directorio de configuración en: %v\n", configDirPath)
+	}
+
+	// Crear la ruta completa del archivo de configuración
+	configFilePath := filepath.Join(configDirPath, "config.config")
+
+	// Verificar si el archivo de configuración existe
+	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {
+		// Si no existe, crear el archivo con valores por defecto
+		file, err := os.Create(configFilePath)
+		if err != nil {
+			fmt.Println("Error al crear el archivo de configuración:", err)
+			return
+		}
+
+		// Definir los valores por defecto
+		defaultConfig := `[config]
+
+port=8080
+dashPort=8081
+protocol=tcp
+maxConnections=100
+debugMode=true
+id=0
+masterMode=true
+secure=false
+
+[nodes]
+
+master=localhost:8080
+`
+
+		// Escribir los valores por defecto en el archivo
+		_, err = file.WriteString(defaultConfig)
+		if err != nil {
+			fmt.Println("Error al escribir en el archivo de configuración:", err)
+			file.Close()
+			return
+		}
+
+		file.Close()
+
+		fmt.Printf("Se ha creado el archivo de configuración en: %v\n", configFilePath)
+	}
+
 	// Abrir el archivo config.config
-	file, err := os.Open("config.config")
+	file, err := os.Open(configFilePath)
 	if err != nil {
 		fmt.Println("Error al abrir el archivo:", err)
 		return
