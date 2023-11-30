@@ -25,7 +25,7 @@ func runNodeMetrics(ctx context.Context, nodeAddress string, name string, id int
 		for {
 			conn, err := grpc.Dial(nodeAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
-				log.Printf("client could not connect to %s with name: %s: %v", nodeAddress, name, err)
+				log.Printf("Client: could not connect to %s with name: %s: %v", nodeAddress, name, err)
 				return err
 			}
 
@@ -58,7 +58,7 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string, name
 
 	stream, err := client.RequestMetrics(ctx, &pb.MetricsRequest{Id: int64(id)})
 	if err != nil {
-		log.Printf("Error making RequestMetrics call to %v: %v", name, err)
+		log.Printf("Client: error making RequestMetrics call to %v: %v", name, err)
 		return err //volvemos a atras y seguimos intentando conectar pasados 3s
 	}
 
