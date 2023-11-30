@@ -50,8 +50,11 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 
 		if err := stream.Send(response); err != nil {
 			log.Printf("Error sending response for metric %s: %v", metrics, err)
-			//return err
+			return err
 		}
+
+		log.Printf("Server: send response in requestMetrics streaming: %v", response.Metrics)
+
 		time.Sleep(time.Second / 4) //se envian metricas cada 1/4 de segundo
 	}
 
