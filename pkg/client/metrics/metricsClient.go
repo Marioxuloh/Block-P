@@ -1,4 +1,4 @@
-package Client
+package MetricsClient
 
 import (
 	models "Block-P/pkg/models"
@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func runNodeMetrics(ctx context.Context, nodeAddress string, name string, id int) error {
+func RunNodeMetrics(ctx context.Context, nodeAddress string, name string, id int) error {
 	//por cada grupo de metricas recibido cada cierto tiempo se actualizara la base de datos para tener un registro de el servidor
 	//hay que tener en cuenta que en call metrics se va a quedar un proceso un tiempo infinito recibiendo cosas del servidor
 	//asique la actualizacion de la base de datos se haria ahi, o simplemente hacerlo todo junto en runnodemetrics y ya.
@@ -25,7 +25,7 @@ func runNodeMetrics(ctx context.Context, nodeAddress string, name string, id int
 		for {
 			conn, err := grpc.Dial(nodeAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
-				log.Printf("Client: could not connect to %s with name: %s: %v", nodeAddress, name, err)
+				log.Printf("Client: could not connect to %v with name: %v: %v", nodeAddress, name, err)
 				return err
 			}
 

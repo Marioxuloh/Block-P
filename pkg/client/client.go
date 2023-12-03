@@ -7,6 +7,8 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+
+	metrics "Block-P/pkg/client/metrics"
 )
 
 // Node
@@ -42,7 +44,7 @@ func Client(nodes []Node, id int) {
 		wg.Add(1)
 		go func(addr string, name string) {
 			defer wg.Done()
-			runNodeMetrics(ctx, addr, name, id)
+			metrics.RunNodeMetrics(ctx, addr, name, id) //ver si por aqui entra tambien la peticion a node1
 		}(Node.Addr, Node.Name)
 	}
 
