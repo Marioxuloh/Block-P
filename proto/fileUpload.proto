@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "./proto";
+
+package proto.fileUploading;
+
+message File {
+  bytes content = 1;
+};
+
+message FileUploadRequest {
+  File file = 1;
+};
+
+message FileUploadResponse{
+  string fileName = 1;
+  bool uploadStatus = 2;
+};
+
+message FileMetadata{
+  string fileNameWithType = 1;
+  int32 contentLength = 2;
+};
+
+service UploadFileService{
+  rpc RequestUploadFile (stream FileUploadRequest) returns (FileUploadResponse);
+};
+

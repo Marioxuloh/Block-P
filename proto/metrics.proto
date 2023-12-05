@@ -11,7 +11,7 @@ message MetricsRequest {
 message Data {
   int64 id = 1;
   map<string, string> metrics = 2;
-}
+};
 
 service MetricService {
   rpc RequestMetrics (MetricsRequest) returns (stream Data);
