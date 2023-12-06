@@ -19,48 +19,48 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UploadFileService_RequestUploadFile_FullMethodName = "/proto.fileUploading.UploadFileService/RequestUploadFile"
+	UploadFileFromMasterService_RequestUploadFile_FullMethodName = "/proto.fileUploading.UploadFileFromMasterService/RequestUploadFile"
 )
 
-// UploadFileServiceClient is the client API for UploadFileService service.
+// UploadFileFromMasterServiceClient is the client API for UploadFileFromMasterService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type UploadFileServiceClient interface {
-	RequestUploadFile(ctx context.Context, opts ...grpc.CallOption) (UploadFileService_RequestUploadFileClient, error)
+type UploadFileFromMasterServiceClient interface {
+	RequestUploadFile(ctx context.Context, opts ...grpc.CallOption) (UploadFileFromMasterService_RequestUploadFileClient, error)
 }
 
-type uploadFileServiceClient struct {
+type uploadFileFromMasterServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewUploadFileServiceClient(cc grpc.ClientConnInterface) UploadFileServiceClient {
-	return &uploadFileServiceClient{cc}
+func NewUploadFileFromMasterServiceClient(cc grpc.ClientConnInterface) UploadFileFromMasterServiceClient {
+	return &uploadFileFromMasterServiceClient{cc}
 }
 
-func (c *uploadFileServiceClient) RequestUploadFile(ctx context.Context, opts ...grpc.CallOption) (UploadFileService_RequestUploadFileClient, error) {
-	stream, err := c.cc.NewStream(ctx, &UploadFileService_ServiceDesc.Streams[0], UploadFileService_RequestUploadFile_FullMethodName, opts...)
+func (c *uploadFileFromMasterServiceClient) RequestUploadFile(ctx context.Context, opts ...grpc.CallOption) (UploadFileFromMasterService_RequestUploadFileClient, error) {
+	stream, err := c.cc.NewStream(ctx, &UploadFileFromMasterService_ServiceDesc.Streams[0], UploadFileFromMasterService_RequestUploadFile_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &uploadFileServiceRequestUploadFileClient{stream}
+	x := &uploadFileFromMasterServiceRequestUploadFileClient{stream}
 	return x, nil
 }
 
-type UploadFileService_RequestUploadFileClient interface {
+type UploadFileFromMasterService_RequestUploadFileClient interface {
 	Send(*FileUploadRequest) error
 	CloseAndRecv() (*FileUploadResponse, error)
 	grpc.ClientStream
 }
 
-type uploadFileServiceRequestUploadFileClient struct {
+type uploadFileFromMasterServiceRequestUploadFileClient struct {
 	grpc.ClientStream
 }
 
-func (x *uploadFileServiceRequestUploadFileClient) Send(m *FileUploadRequest) error {
+func (x *uploadFileFromMasterServiceRequestUploadFileClient) Send(m *FileUploadRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *uploadFileServiceRequestUploadFileClient) CloseAndRecv() (*FileUploadResponse, error) {
+func (x *uploadFileFromMasterServiceRequestUploadFileClient) CloseAndRecv() (*FileUploadResponse, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
@@ -71,53 +71,54 @@ func (x *uploadFileServiceRequestUploadFileClient) CloseAndRecv() (*FileUploadRe
 	return m, nil
 }
 
-// UploadFileServiceServer is the server API for UploadFileService service.
-// All implementations must embed UnimplementedUploadFileServiceServer
+// UploadFileFromMasterServiceServer is the server API for UploadFileFromMasterService service.
+// All implementations must embed UnimplementedUploadFileFromMasterServiceServer
 // for forward compatibility
-type UploadFileServiceServer interface {
-	RequestUploadFile(UploadFileService_RequestUploadFileServer) error
-	mustEmbedUnimplementedUploadFileServiceServer()
+type UploadFileFromMasterServiceServer interface {
+	RequestUploadFile(UploadFileFromMasterService_RequestUploadFileServer) error
+	mustEmbedUnimplementedUploadFileFromMasterServiceServer()
 }
 
-// UnimplementedUploadFileServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedUploadFileServiceServer struct {
+// UnimplementedUploadFileFromMasterServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedUploadFileFromMasterServiceServer struct {
 }
 
-func (UnimplementedUploadFileServiceServer) RequestUploadFile(UploadFileService_RequestUploadFileServer) error {
+func (UnimplementedUploadFileFromMasterServiceServer) RequestUploadFile(UploadFileFromMasterService_RequestUploadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method RequestUploadFile not implemented")
 }
-func (UnimplementedUploadFileServiceServer) mustEmbedUnimplementedUploadFileServiceServer() {}
+func (UnimplementedUploadFileFromMasterServiceServer) mustEmbedUnimplementedUploadFileFromMasterServiceServer() {
+}
 
-// UnsafeUploadFileServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to UploadFileServiceServer will
+// UnsafeUploadFileFromMasterServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UploadFileFromMasterServiceServer will
 // result in compilation errors.
-type UnsafeUploadFileServiceServer interface {
-	mustEmbedUnimplementedUploadFileServiceServer()
+type UnsafeUploadFileFromMasterServiceServer interface {
+	mustEmbedUnimplementedUploadFileFromMasterServiceServer()
 }
 
-func RegisterUploadFileServiceServer(s grpc.ServiceRegistrar, srv UploadFileServiceServer) {
-	s.RegisterService(&UploadFileService_ServiceDesc, srv)
+func RegisterUploadFileFromMasterServiceServer(s grpc.ServiceRegistrar, srv UploadFileFromMasterServiceServer) {
+	s.RegisterService(&UploadFileFromMasterService_ServiceDesc, srv)
 }
 
-func _UploadFileService_RequestUploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(UploadFileServiceServer).RequestUploadFile(&uploadFileServiceRequestUploadFileServer{stream})
+func _UploadFileFromMasterService_RequestUploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(UploadFileFromMasterServiceServer).RequestUploadFile(&uploadFileFromMasterServiceRequestUploadFileServer{stream})
 }
 
-type UploadFileService_RequestUploadFileServer interface {
+type UploadFileFromMasterService_RequestUploadFileServer interface {
 	SendAndClose(*FileUploadResponse) error
 	Recv() (*FileUploadRequest, error)
 	grpc.ServerStream
 }
 
-type uploadFileServiceRequestUploadFileServer struct {
+type uploadFileFromMasterServiceRequestUploadFileServer struct {
 	grpc.ServerStream
 }
 
-func (x *uploadFileServiceRequestUploadFileServer) SendAndClose(m *FileUploadResponse) error {
+func (x *uploadFileFromMasterServiceRequestUploadFileServer) SendAndClose(m *FileUploadResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *uploadFileServiceRequestUploadFileServer) Recv() (*FileUploadRequest, error) {
+func (x *uploadFileFromMasterServiceRequestUploadFileServer) Recv() (*FileUploadRequest, error) {
 	m := new(FileUploadRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -125,18 +126,136 @@ func (x *uploadFileServiceRequestUploadFileServer) Recv() (*FileUploadRequest, e
 	return m, nil
 }
 
-// UploadFileService_ServiceDesc is the grpc.ServiceDesc for UploadFileService service.
+// UploadFileFromMasterService_ServiceDesc is the grpc.ServiceDesc for UploadFileFromMasterService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var UploadFileService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.fileUploading.UploadFileService",
-	HandlerType: (*UploadFileServiceServer)(nil),
+var UploadFileFromMasterService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.fileUploading.UploadFileFromMasterService",
+	HandlerType: (*UploadFileFromMasterServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "RequestUploadFile",
-			Handler:       _UploadFileService_RequestUploadFile_Handler,
+			Handler:       _UploadFileFromMasterService_RequestUploadFile_Handler,
 			ClientStreams: true,
+		},
+	},
+	Metadata: "proto/fileUpload.proto",
+}
+
+const (
+	UploadFileFromNodeService_RequestUploadFile_FullMethodName = "/proto.fileUploading.UploadFileFromNodeService/RequestUploadFile"
+)
+
+// UploadFileFromNodeServiceClient is the client API for UploadFileFromNodeService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type UploadFileFromNodeServiceClient interface {
+	RequestUploadFile(ctx context.Context, in *FileUploadResponse, opts ...grpc.CallOption) (UploadFileFromNodeService_RequestUploadFileClient, error)
+}
+
+type uploadFileFromNodeServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewUploadFileFromNodeServiceClient(cc grpc.ClientConnInterface) UploadFileFromNodeServiceClient {
+	return &uploadFileFromNodeServiceClient{cc}
+}
+
+func (c *uploadFileFromNodeServiceClient) RequestUploadFile(ctx context.Context, in *FileUploadResponse, opts ...grpc.CallOption) (UploadFileFromNodeService_RequestUploadFileClient, error) {
+	stream, err := c.cc.NewStream(ctx, &UploadFileFromNodeService_ServiceDesc.Streams[0], UploadFileFromNodeService_RequestUploadFile_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &uploadFileFromNodeServiceRequestUploadFileClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type UploadFileFromNodeService_RequestUploadFileClient interface {
+	Recv() (*FileUploadRequest, error)
+	grpc.ClientStream
+}
+
+type uploadFileFromNodeServiceRequestUploadFileClient struct {
+	grpc.ClientStream
+}
+
+func (x *uploadFileFromNodeServiceRequestUploadFileClient) Recv() (*FileUploadRequest, error) {
+	m := new(FileUploadRequest)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// UploadFileFromNodeServiceServer is the server API for UploadFileFromNodeService service.
+// All implementations must embed UnimplementedUploadFileFromNodeServiceServer
+// for forward compatibility
+type UploadFileFromNodeServiceServer interface {
+	RequestUploadFile(*FileUploadResponse, UploadFileFromNodeService_RequestUploadFileServer) error
+	mustEmbedUnimplementedUploadFileFromNodeServiceServer()
+}
+
+// UnimplementedUploadFileFromNodeServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedUploadFileFromNodeServiceServer struct {
+}
+
+func (UnimplementedUploadFileFromNodeServiceServer) RequestUploadFile(*FileUploadResponse, UploadFileFromNodeService_RequestUploadFileServer) error {
+	return status.Errorf(codes.Unimplemented, "method RequestUploadFile not implemented")
+}
+func (UnimplementedUploadFileFromNodeServiceServer) mustEmbedUnimplementedUploadFileFromNodeServiceServer() {
+}
+
+// UnsafeUploadFileFromNodeServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UploadFileFromNodeServiceServer will
+// result in compilation errors.
+type UnsafeUploadFileFromNodeServiceServer interface {
+	mustEmbedUnimplementedUploadFileFromNodeServiceServer()
+}
+
+func RegisterUploadFileFromNodeServiceServer(s grpc.ServiceRegistrar, srv UploadFileFromNodeServiceServer) {
+	s.RegisterService(&UploadFileFromNodeService_ServiceDesc, srv)
+}
+
+func _UploadFileFromNodeService_RequestUploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(FileUploadResponse)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(UploadFileFromNodeServiceServer).RequestUploadFile(m, &uploadFileFromNodeServiceRequestUploadFileServer{stream})
+}
+
+type UploadFileFromNodeService_RequestUploadFileServer interface {
+	Send(*FileUploadRequest) error
+	grpc.ServerStream
+}
+
+type uploadFileFromNodeServiceRequestUploadFileServer struct {
+	grpc.ServerStream
+}
+
+func (x *uploadFileFromNodeServiceRequestUploadFileServer) Send(m *FileUploadRequest) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+// UploadFileFromNodeService_ServiceDesc is the grpc.ServiceDesc for UploadFileFromNodeService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var UploadFileFromNodeService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.fileUploading.UploadFileFromNodeService",
+	HandlerType: (*UploadFileFromNodeServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "RequestUploadFile",
+			Handler:       _UploadFileFromNodeService_RequestUploadFile_Handler,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "proto/fileUpload.proto",

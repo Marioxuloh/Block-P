@@ -22,7 +22,15 @@ message FileMetadata{
   int32 contentLength = 2;
 };
 
-service UploadFileService{
+//1(lo manda el master)
+//lo que se busca es que el servidor inyecte el codigo en los servicios en la carpeta principal 
+service UploadFileFromMasterService{
   rpc RequestUploadFile (stream FileUploadRequest) returns (FileUploadResponse);
 };
 
+//2(lo manda el nodo)
+//lo que se busca esque si nos mandan ejecutar un servicio y no tenemos los archivos para ello, pedirlos
+//por lo que el stream se haria en el return, esto se insertaria en la carpeta secundaria llamada common o algo asi
+service UploadFileFromNodeService{
+  rpc RequestUploadFile (FileUploadResponse) returns (stream  FileUploadRequest);
+};
