@@ -16,3 +16,7 @@ message Data {
 service MetricService {
   rpc RequestMetrics (MetricsRequest) returns (stream Data);
 };
+
+//este servicio sirve para que el nodo maestro pida las metricas en tiempo real de los nodos
+//estos crean una conexion stream ininterrumpida por la cual se mandan las metricas cada 1/4s
+//estan contemplados todos los timeouts por si se cae el servidor o el nodo en los cuales se intentaria volver a reconectar infinitamente cada 3s

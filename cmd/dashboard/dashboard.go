@@ -1,26 +1,28 @@
 package Dashboard
 
 import (
-	"Block-P/cmd/dashboard/controllers"
+	"embed"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
+//go:embed view/*
+var content embed.FS
+
 func Dashboard(address string) {
 	router := gin.Default()
 
-	router.Static("/dashboard", "./cmd/dashboard/view")
+	//manejo de errores en el middelware
+	router.Use(gin.Recovery())
+
+	// Servir archivos estáticos incrustados desde la carpeta "view"
+	router.StaticFS("/dashboard", http.FS(content))
 
 	// Configurar rutas
-	router.GET("/", func(c *gin.Context) {
+	router.GET("/dashboard", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})
-
-	// Rutas de websockets
-	wsController := controllers.NewWebsocketController()
-	router.GET("/ws", wsController.HandleWebSocket)
-	router.GET("/send-message", wsController.SendMessage)
 
 	router.Run(address)
 }
