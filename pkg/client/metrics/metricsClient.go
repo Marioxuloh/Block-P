@@ -85,10 +85,10 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string, name
 				log.Printf("Client: received a data from %v: %v", name, metrics)
 				aux++
 				if aux == eachMetrics {
-					models.UpdateDatabaseMetrics(nodeAddress, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log
+					models.UpdateDatabaseMetrics(nodeAddress, name, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log
 					aux = 0
 				}
-				models.UpdateDashboardMetrics(nodeAddress, metrics) //cada 1/4s
+				models.UpdateDashboardMetrics(nodeAddress, name, metrics) //cada 1/4s
 			}
 		}()
 	}

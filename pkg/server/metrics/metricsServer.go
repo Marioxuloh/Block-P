@@ -49,7 +49,7 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 		}
 
 		if err := stream.Send(response); err != nil {
-			log.Printf("Error sending response for metric %s: %v", metrics, err)
+			log.Printf("Server: Error sending response for metric %s: %v", metrics, err)
 			return err
 		}
 
