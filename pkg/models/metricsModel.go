@@ -8,3 +8,7 @@ func UpdateDatabaseMetrics(nodeAddress string, metrics map[string]string) {
 	// key es la clave del mapa, y value es el valor asociado.
 	//}
 }
+
+func UpdateDashboardMetrics(nodeAddress string, metrics map[string]string) {
+	//LLAMAR al controlador
+}

@@ -12,42 +12,45 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func RunNodeMetrics(ctx context.Context, nodeAddress string, name string, id int) error {
-	//por cada grupo de metricas recibido cada cierto tiempo se actualizara la base de datos para tener un registro de el servidor
-	//hay que tener en cuenta que en call metrics se va a quedar un proceso un tiempo infinito recibiendo cosas del servidor
-	//asique la actualizacion de la base de datos se haria ahi, o simplemente hacerlo todo junto en runnodemetrics y ya.
+func RunNodeMetrics(ctx context.Context, nodeAddress string, name string, id int, maxRetries int, timeout time.Duration, eachMetrics int) error {
 	select {
 	case <-ctx.Done():
 		log.Println("Client: Graceful shutdown requested. Exiting runNodeCheck...")
 		return nil
 	default:
-
+		retires := 0
 		for {
 			conn, err := grpc.Dial(nodeAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
-				log.Printf("Client: could not connect to %v with name: %v: %v", nodeAddress, name, err)
+				log.Printf("Client: could not create dial to %v with name: %v: %v", nodeAddress, name, err)
 				return err
 			}
 
 			client := pb.NewMetricServiceClient(conn)
 
-			metrics := callMetrics(client, id, nodeAddress, name)
+			metrics := callMetrics(client, id, nodeAddress, name, timeout, eachMetrics)
 
 			conn.Close()
 
-			if metrics == nil {
+			retires++
+
+			if metrics == io.EOF {
+				log.Printf("Client: closing streaming, EOF received from node: %v", nodeAddress) //el nodo ha mandado un eof
 				return nil
+			} else if retires >= maxRetries {
+				log.Printf("Client: closing streaming, max retries detected on node: %v with err: %v", nodeAddress, metrics) //se han terminado los retires
+				return nil
+			} else {
+				log.Printf("Client: retrying connect to node: %v with err: %v", nodeAddress, metrics) //retrying connect
 			}
-			time.Sleep(3 * time.Second) //esperamos 3 segundos segun fibonacci antes de volver a intentar conectar
+
 		}
 	}
 }
 
-func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string, name string) error {
+func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string, name string, timeout time.Duration, eachMetrics int) error {
 
 	var response error
-
-	timeout := 13 * time.Second //fibonacci
 
 	timer := time.NewTimer(timeout)
 
@@ -58,42 +61,41 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string, name
 
 	stream, err := client.RequestMetrics(ctx, &pb.MetricsRequest{Id: int64(id)})
 	if err != nil {
-		log.Printf("Client: error making RequestMetrics call to %v: %v", name, err)
-		return err //volvemos a atras y seguimos intentando conectar pasados 3s
+		response = err
+	} else {
+		go func() {
+			aux := 0
+			for {
+				data, err := stream.Recv()
+				if err == io.EOF {
+					log.Printf("Client: End Of File detected, closing streaming in timeout: %d err: %v", timeout, err)
+					response = io.EOF //salimos totalmente y no volvemos a intentar conectar
+					break
+				}
+				if err != nil {
+					log.Printf("Client: could not Recv, error while streaming, retrying connect in timeout: %d err: %v", timeout, err)
+					response = err //salimos y volvemos a intentar conectar pasados 13s
+					timer = time.NewTimer(timeout)
+					break
+				}
+				for key, value := range data.Metrics {
+					metrics[key] = value
+				}
+				timer = time.NewTimer(timeout)
+				log.Printf("Client: received a data from %v: %v", name, metrics)
+				aux++
+				if aux == eachMetrics {
+					models.UpdateDatabaseMetrics(nodeAddress, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log
+					aux = 0
+				}
+				models.UpdateDashboardMetrics(nodeAddress, metrics) //cada 1/4s
+			}
+		}()
 	}
-
-	go func() {
-		for {
-			data, err := stream.Recv()
-			if err == io.EOF {
-				log.Printf("Client: End Of File detected, closing streaming in timeout: %d err: %v", timeout, err)
-				response = nil //salimos totalmente y no volvemos a intentar conectar
-				break
-			}
-			if err != nil {
-				log.Printf("Client: could not Recv, error while streaming, retrying connect in timeout: %d err: %v", timeout, err)
-				response = err //salimos y volvemos a intentar conectar pasados 13s
-				break
-			}
-			for key, value := range data.Metrics {
-				metrics[key] = value
-			}
-			timer = time.NewTimer(timeout)
-			log.Printf("Client: received a data from %v: %v", name, metrics)
-			models.UpdateDatabaseMetrics(nodeAddress, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log
-		}
-	}()
-
 	for {
 		select {
 		case <-timer.C:
-			if response == nil {
-				log.Printf("Client: closing streaming, Timeout expired on node: %v", nodeAddress) //el servidor ha mandado un eof y cerramos streaming
-				return response
-			} else {
-				log.Printf("Client: retrying to connect, Timeout expired on node: %v", nodeAddress) //fallo de conexion, se reintenta conectar
-				return response
-			}
+			return response
 		default:
 		}
 	}
