@@ -1,12 +1,15 @@
 package MetricsServer
 
 import (
+	metrics "Block-P/pkg/client/metrics"
+	model "Block-P/pkg/models"
 	pb "Block-P/proto" // pakages generated with .proto
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
-
-var Id int
 
 type metricsServer struct {
 	pb.MetricServiceServer
@@ -20,42 +23,74 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 
 	log.Printf("Server: MetricsRequest received from nodeID: %v", req.Id)
 
+	// Create a channel to listen for interrupts
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
+
+	done := make(chan struct{}) //canal por el que se notifica que han acabado las subrutinas
+
+	// Goroutine to handle interrupts and close the stream
+	go func() {
+		<-interrupt
+		log.Println("Server: on RequestMetrics service, A interrupt signal was received. Closing the stream.")
+		// Close the stream gracefully by sending an EOF
+		if err := stream.Send(nil); err != nil {
+			log.Printf("Server: on RequestMetrics service, Error sending EOF: %v", err)
+		}
+		close(done)
+	}()
+
 	for {
-		cpu, err := getCPU()
-		if err != nil {
-			log.Printf("Error getting CPU usage: %v", err)
-			cpu = "N/A"
-		}
-		mem, err := getMEM()
-		if err != nil {
-			log.Printf("Error getting MEM usage: %v", err)
-			mem = "N/A"
-		}
-		disk, err := getDISK()
-		if err != nil {
-			log.Printf("Error getting DISK usage: %v", err)
-			disk = "N/A"
-		}
 
-		metrics := map[string]string{
-			"cpu":  cpu,
-			"mem":  mem,
-			"disk": disk,
+		select {
+		case <-done:
+			return nil
+		default:
+			cpu, err := getCPU()
+			if err != nil {
+				log.Printf("Error getting CPU usage: %v", err)
+				cpu = "N/A"
+			}
+			mem, err := getMEM()
+			if err != nil {
+				log.Printf("Error getting MEM usage: %v", err)
+				mem = "N/A"
+			}
+			disk, err := getDISK()
+			if err != nil {
+				log.Printf("Error getting DISK usage: %v", err)
+				disk = "N/A"
+			}
+
+			metrics := map[string]string{
+				"cpu":  cpu,
+				"mem":  mem,
+				"disk": disk,
+			}
+
+			response := &pb.Data{
+				Id:      model.GlobalConfig.ID,
+				Metrics: metrics,
+			}
+
+			if err := stream.Send(response); err != nil {
+				log.Printf("Server: on RequestMetrics service, Error sending response for metric %s: %v", metrics, err)
+			}
+
+			time.Sleep(time.Second / 4) //se envian metricas cada 1/4 de segundo
 		}
-
-		response := &pb.Data{
-			Id:      int64(Id),
-			Metrics: metrics,
-		}
-
-		if err := stream.Send(response); err != nil {
-			log.Printf("Server: Error sending response for metric %s: %v", metrics, err)
-			return err
-		}
-
-		log.Printf("Server: send response in requestMetrics streaming: %v", response.Metrics)
-
-		time.Sleep(time.Second / 4) //se envian metricas cada 1/4 de segundo
 	}
+}
 
+func (s *metricsServer) RequestMetricsFromNode(req *pb.MetricsRequestTrigger, stream pb.MetricService_RequestMetricsFromNodeServer) error {
+	log.Printf("Server: on RequestMetricsFromNode service, received MetricsRequestTrigger from nodeAddress: %v name: %v nodeID: %v", req.NodeAddress, req.Name, req.Id)
+	response := &pb.Ack{
+		Ack: string("success"),
+	}
+	if err := stream.Send(response); err != nil {
+		log.Printf("Server: Error sending response ack: %v", err)
+		return err
+	}
+	metrics.RunNodeMetrics(req.NodeAddress, req.Name, req.Id, 5, 13*time.Second, 15) //llamamos a esto para que ya se haga el intercambio de datos
+	return nil
 }

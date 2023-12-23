@@ -12,43 +12,70 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func RunNodeMetrics(ctx context.Context, nodeAddress string, name string, id int, maxRetries int, timeout time.Duration, eachMetrics int) error {
-	select {
-	case <-ctx.Done():
-		log.Println("Client: Graceful shutdown requested. Exiting runNodeCheck...")
-		return nil
-	default:
-		retires := 0
-		for {
-			conn, err := grpc.Dial(nodeAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
-			if err != nil {
-				log.Printf("Client: could not create dial to %v with name: %v: %v", nodeAddress, name, err)
-				return err
-			}
+func MetricsRequestFromNodeToMaster(masterAddress string, nodeAddress string, name string, id int64) error {
 
-			client := pb.NewMetricServiceClient(conn)
-
-			metrics := callMetrics(client, id, nodeAddress, name, timeout, eachMetrics)
-
-			conn.Close()
-
-			retires++
-
-			if metrics == io.EOF {
-				log.Printf("Client: closing streaming, EOF received from node: %v", nodeAddress) //el nodo ha mandado un eof
-				return nil
-			} else if retires >= maxRetries {
-				log.Printf("Client: closing streaming, max retries detected on node: %v with err: %v", nodeAddress, metrics) //se han terminado los retires
-				return nil
-			} else {
-				log.Printf("Client: retrying connect to node: %v with err: %v", nodeAddress, metrics) //retrying connect
-			}
-
-		}
+	conn, err := grpc.Dial(masterAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Printf("Client: could not create dial to %v", masterAddress)
+		return err
 	}
+	defer conn.Close()
+
+	client := pb.NewMetricServiceClient(conn)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	stream, err := client.RequestMetricsFromNode(ctx, &pb.MetricsRequestTrigger{NodeAddress: nodeAddress, Name: name, Id: int64(id)})
+	if err != nil {
+		log.Printf("Client: could not send RequestMetricsFromNode to %v", masterAddress)
+		return err
+	}
+
+	ack, err := stream.Recv()
+	if err != nil {
+		log.Printf("Client: could not recv RequestMetricsFromNode ack from %v", masterAddress)
+		return err
+	}
+
+	log.Printf("Client: on RequestMetricsFromNode service, received %v from master", ack)
+
+	return nil
 }
 
-func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string, name string, timeout time.Duration, eachMetrics int) error {
+func RunNodeMetrics(nodeAddress string, name string, id int64, maxRetries int, timeout time.Duration, eachMetrics int) error {
+
+	retires := 0
+	for {
+		conn, err := grpc.Dial(nodeAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			log.Printf("Client: could not create dial to %v with name: %v: %v", nodeAddress, name, err)
+			return err
+		}
+
+		client := pb.NewMetricServiceClient(conn)
+
+		metrics := callMetrics(client, id, nodeAddress, name, timeout, eachMetrics)
+
+		conn.Close()
+
+		retires++
+
+		if metrics == io.EOF {
+			log.Printf("Client: on RequestMetrics service, closing streaming, EOF received from node: %v", nodeAddress) //el nodo ha mandado un eof
+			return nil
+		} else if retires >= maxRetries {
+			log.Printf("Client: on RequestMetrics service, closing streaming, max retries detected on node: %v with err: %v", nodeAddress, metrics) //se han terminado los retires
+			return nil
+		} else {
+			log.Printf("Client: on RequestMetrics service, retrying connect to node: %v with err: %v", nodeAddress, metrics) //retrying connect
+		}
+
+	}
+
+}
+
+func callMetrics(client pb.MetricServiceClient, id int64, nodeAddress string, name string, timeout time.Duration, eachMetrics int) error {
 
 	var response error
 
@@ -68,12 +95,12 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string, name
 			for {
 				data, err := stream.Recv()
 				if err == io.EOF {
-					log.Printf("Client: End Of File detected, closing streaming in timeout: %d err: %v", timeout, err)
+					log.Printf("Client: on RequestMetrics service, End Of File detected, closing streaming in timeout: %d err: %v", timeout, err)
 					response = io.EOF //salimos totalmente y no volvemos a intentar conectar
 					break
 				}
 				if err != nil {
-					log.Printf("Client: could not Recv, error while streaming, retrying connect in timeout: %d err: %v", timeout, err)
+					log.Printf("Client: on RequestMetrics service, could not Recv, error while streaming, retrying connect in timeout: %d err: %v", timeout, err)
 					response = err //salimos y volvemos a intentar conectar pasados 13s
 					timer = time.NewTimer(timeout)
 					break
@@ -82,7 +109,7 @@ func callMetrics(client pb.MetricServiceClient, id int, nodeAddress string, name
 					metrics[key] = value
 				}
 				timer = time.NewTimer(timeout)
-				log.Printf("Client: received a data from %v: %v", name, metrics)
+				log.Printf("Client: on RequestMetrics service, received a data from %v: %v", name, metrics)
 				aux++
 				if aux == eachMetrics {
 					models.UpdateDatabaseMetrics(nodeAddress, name, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log

@@ -9,7 +9,7 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Ruta al archivo proto
-PROTO_FILE="proto/fileUpload.proto"
+PROTO_FILE="proto/metrics.proto"
 
 # Ejecuta protoc con las opciones necesarias
 sudo protoc --go_out=. --go_opt=paths=source_relative \

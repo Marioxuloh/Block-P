@@ -1,6 +1,7 @@
 package Dashboard
 
 import (
+	model "Block-P/pkg/models"
 	"embed"
 	"fmt"
 	"io"
@@ -16,21 +17,25 @@ import (
 //go:embed view/build
 var UI embed.FS
 
-func Dashboard(address string) {
+func Dashboard() error {
 
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", handleStatic)
 
-	if err := http.ListenAndServe(address, mux); err != nil {
+	if err := http.ListenAndServe(model.GlobalConfig.DashAddress, mux); err != nil {
 		log.Println("server failed:", err)
+		return err
 	}
+	return nil
 }
+
 func handleStatic(w http.ResponseWriter, r *http.Request) {
 
 	uiFS, err := fs.Sub(UI, "view/build")
 	if err != nil {
 		log.Fatal("failed to get ui fs", err)
+		return
 	}
 
 	if r.Method != "GET" {

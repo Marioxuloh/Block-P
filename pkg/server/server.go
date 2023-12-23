@@ -4,30 +4,29 @@ import (
 	"log"
 	"net"
 
+	model "Block-P/pkg/models"
 	metrics "Block-P/pkg/server/metrics"
 	pb "Block-P/proto" // pakages generated with .proto
 
 	"google.golang.org/grpc"
 )
 
-var id int
+func Server() error {
 
-func Server(protocol string, address string, nodeID int) {
-
-	id = nodeID
-
-	metrics.Id = id
-
-	lis, err := net.Listen(protocol, address)
+	lis, err := net.Listen(model.GlobalConfig.Protocol, model.GlobalConfig.PortAddress)
 	if err != nil {
 		log.Fatalf("failed to start the server: %v", err)
+		return err
 	}
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterMetricServiceServer(grpcServer, metrics.InitMetricsServer())
+
 	log.Printf("server started at %v", lis.Addr())
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to start the server: %v", err)
+		return err
 	}
+	return nil
 
 }

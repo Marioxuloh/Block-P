@@ -1,54 +1,21 @@
 package Client
 
 import (
-	"context"
-	"log"
-	"os"
-	"os/signal"
-	"sync"
-	"syscall"
-	"time"
-
 	metrics "Block-P/pkg/client/metrics"
+	models "Block-P/pkg/models"
+	"log"
 )
 
-// Node
-type Node struct {
-	Name string
-	Addr string
-}
+func Client() error {
 
-var (
-	shutdownRequested = false
-)
-
-func Client(nodes []Node, id int) {
-	// Configurar el manejador de señales para manejar Ctrl+C
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM) //señales SIGINT(os.Interrupt) y SIGTERM(syscall.SIGTERM)
-
-	// Configurar contexto para el cierre ordenado
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	go func() {
-		// Esperar la señal de interrupción
-		<-sigCh
-		log.Println("Client: A interrupt signal was received. Shutting down gracefully...")
-		shutdownRequested = true
-		cancel()
-	}()
-
-	var wg sync.WaitGroup
-
-	for _, Node := range nodes {
-		wg.Add(1)
-		go func(addr string, name string) {
-			defer wg.Done()
-			metrics.RunNodeMetrics(ctx, addr, name, id, 5, 13*time.Second, 15)
-		}(Node.Addr, Node.Name)
+	for _, Node := range models.GlobalConfig.Nodes {
+		if Node.Name == "master" {
+			err := metrics.MetricsRequestFromNodeToMaster(Node.Addr, models.GlobalConfig.FullAddress, models.GlobalConfig.Name, models.GlobalConfig.ID)
+			if err != nil {
+				log.Printf("Client: could not MetricsRequestFromNodeToMaster error %v", err)
+				return err
+			}
+		}
 	}
-
-	wg.Wait()
-
+	return nil
 }

@@ -8,9 +8,19 @@ message MetricsRequest {
   int64 id = 1;
 };
 
+message MetricsRequestTrigger {
+  string nodeAddress = 1;
+  string name = 2;
+  int64 id = 3;
+};
+
 message Data {
   int64 id = 1;
   map<string, string> metrics = 2;
+};
+
+message Ack {
+  string ack = 1;
 };
 
 //este servicio sirve para que el nodo maestro pida las metricas en tiempo real de los nodos
@@ -18,4 +28,5 @@ message Data {
 //estan contemplados todos los timeouts por si se cae el servidor o el nodo en los cuales se intentaria volver a reconectar infinitamente cada 3s
 service MetricService {
   rpc RequestMetrics (MetricsRequest) returns (stream Data);
+  rpc RequestMetricsFromNode (MetricsRequestTrigger) returns (stream Ack);
 };
