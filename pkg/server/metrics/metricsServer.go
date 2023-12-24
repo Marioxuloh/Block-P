@@ -1,9 +1,10 @@
 package MetricsServer
 
 import (
-	metrics "Block-P/pkg/client/metrics"
+	metricsClient "Block-P/pkg/client/metrics"
 	model "Block-P/pkg/models"
 	pb "Block-P/proto" // pakages generated with .proto
+	"context"
 	"log"
 	"os"
 	"os/signal"
@@ -82,15 +83,11 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 	}
 }
 
-func (s *metricsServer) RequestMetricsFromNode(req *pb.MetricsRequestTrigger, stream pb.MetricService_RequestMetricsFromNodeServer) error {
+func (s *metricsServer) RequestMetricsFromNode(ctx context.Context, req *pb.MetricsRequestTrigger) (*pb.Ack, error) {
 	log.Printf("Server: on RequestMetricsFromNode service, received MetricsRequestTrigger from nodeAddress: %v name: %v nodeID: %v", req.NodeAddress, req.Name, req.Id)
 	response := &pb.Ack{
 		Ack: string("success"),
 	}
-	if err := stream.Send(response); err != nil {
-		log.Printf("Server: Error sending response ack: %v", err)
-		return err
-	}
-	metrics.RunNodeMetrics(req.NodeAddress, req.Name, req.Id, 5, 13*time.Second, 15) //llamamos a esto para que ya se haga el intercambio de datos
-	return nil
+	go metricsClient.RunNodeMetrics(req.NodeAddress, req.Name, req.Id, 5, 13*time.Second, 15)
+	return response, nil
 }

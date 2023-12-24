@@ -28,5 +28,5 @@ message Ack {
 //estan contemplados todos los timeouts por si se cae el servidor o el nodo en los cuales se intentaria volver a reconectar infinitamente cada 3s
 service MetricService {
   rpc RequestMetrics (MetricsRequest) returns (stream Data);
-  rpc RequestMetricsFromNode (MetricsRequestTrigger) returns (stream Ack);
+  rpc RequestMetricsFromNode (MetricsRequestTrigger) returns (Ack);
 };

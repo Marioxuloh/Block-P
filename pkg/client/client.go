@@ -17,5 +17,6 @@ func Client() error {
 			}
 		}
 	}
+
 	return nil
 }

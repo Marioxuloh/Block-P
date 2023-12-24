@@ -28,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MetricServiceClient interface {
 	RequestMetrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (MetricService_RequestMetricsClient, error)
-	RequestMetricsFromNode(ctx context.Context, in *MetricsRequestTrigger, opts ...grpc.CallOption) (MetricService_RequestMetricsFromNodeClient, error)
+	RequestMetricsFromNode(ctx context.Context, in *MetricsRequestTrigger, opts ...grpc.CallOption) (*Ack, error)
 }
 
 type metricServiceClient struct {
@@ -71,36 +71,13 @@ func (x *metricServiceRequestMetricsClient) Recv() (*Data, error) {
 	return m, nil
 }
 
-func (c *metricServiceClient) RequestMetricsFromNode(ctx context.Context, in *MetricsRequestTrigger, opts ...grpc.CallOption) (MetricService_RequestMetricsFromNodeClient, error) {
-	stream, err := c.cc.NewStream(ctx, &MetricService_ServiceDesc.Streams[1], MetricService_RequestMetricsFromNode_FullMethodName, opts...)
+func (c *metricServiceClient) RequestMetricsFromNode(ctx context.Context, in *MetricsRequestTrigger, opts ...grpc.CallOption) (*Ack, error) {
+	out := new(Ack)
+	err := c.cc.Invoke(ctx, MetricService_RequestMetricsFromNode_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &metricServiceRequestMetricsFromNodeClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type MetricService_RequestMetricsFromNodeClient interface {
-	Recv() (*Ack, error)
-	grpc.ClientStream
-}
-
-type metricServiceRequestMetricsFromNodeClient struct {
-	grpc.ClientStream
-}
-
-func (x *metricServiceRequestMetricsFromNodeClient) Recv() (*Ack, error) {
-	m := new(Ack)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 // MetricServiceServer is the server API for MetricService service.
@@ -108,7 +85,7 @@ func (x *metricServiceRequestMetricsFromNodeClient) Recv() (*Ack, error) {
 // for forward compatibility
 type MetricServiceServer interface {
 	RequestMetrics(*MetricsRequest, MetricService_RequestMetricsServer) error
-	RequestMetricsFromNode(*MetricsRequestTrigger, MetricService_RequestMetricsFromNodeServer) error
+	RequestMetricsFromNode(context.Context, *MetricsRequestTrigger) (*Ack, error)
 	mustEmbedUnimplementedMetricServiceServer()
 }
 
@@ -119,8 +96,8 @@ type UnimplementedMetricServiceServer struct {
 func (UnimplementedMetricServiceServer) RequestMetrics(*MetricsRequest, MetricService_RequestMetricsServer) error {
 	return status.Errorf(codes.Unimplemented, "method RequestMetrics not implemented")
 }
-func (UnimplementedMetricServiceServer) RequestMetricsFromNode(*MetricsRequestTrigger, MetricService_RequestMetricsFromNodeServer) error {
-	return status.Errorf(codes.Unimplemented, "method RequestMetricsFromNode not implemented")
+func (UnimplementedMetricServiceServer) RequestMetricsFromNode(context.Context, *MetricsRequestTrigger) (*Ack, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestMetricsFromNode not implemented")
 }
 func (UnimplementedMetricServiceServer) mustEmbedUnimplementedMetricServiceServer() {}
 
@@ -156,25 +133,22 @@ func (x *metricServiceRequestMetricsServer) Send(m *Data) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _MetricService_RequestMetricsFromNode_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(MetricsRequestTrigger)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _MetricService_RequestMetricsFromNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MetricsRequestTrigger)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(MetricServiceServer).RequestMetricsFromNode(m, &metricServiceRequestMetricsFromNodeServer{stream})
-}
-
-type MetricService_RequestMetricsFromNodeServer interface {
-	Send(*Ack) error
-	grpc.ServerStream
-}
-
-type metricServiceRequestMetricsFromNodeServer struct {
-	grpc.ServerStream
-}
-
-func (x *metricServiceRequestMetricsFromNodeServer) Send(m *Ack) error {
-	return x.ServerStream.SendMsg(m)
+	if interceptor == nil {
+		return srv.(MetricServiceServer).RequestMetricsFromNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MetricService_RequestMetricsFromNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetricServiceServer).RequestMetricsFromNode(ctx, req.(*MetricsRequestTrigger))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 // MetricService_ServiceDesc is the grpc.ServiceDesc for MetricService service.
@@ -183,16 +157,16 @@ func (x *metricServiceRequestMetricsFromNodeServer) Send(m *Ack) error {
 var MetricService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.monitoring.MetricService",
 	HandlerType: (*MetricServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "RequestMetricsFromNode",
+			Handler:    _MetricService_RequestMetricsFromNode_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "RequestMetrics",
 			Handler:       _MetricService_RequestMetrics_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "RequestMetricsFromNode",
-			Handler:       _MetricService_RequestMetricsFromNode_Handler,
 			ServerStreams: true,
 		},
 	},

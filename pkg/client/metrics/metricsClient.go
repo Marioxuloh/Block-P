@@ -26,19 +26,13 @@ func MetricsRequestFromNodeToMaster(masterAddress string, nodeAddress string, na
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	stream, err := client.RequestMetricsFromNode(ctx, &pb.MetricsRequestTrigger{NodeAddress: nodeAddress, Name: name, Id: int64(id)})
+	res, err := client.RequestMetricsFromNode(ctx, &pb.MetricsRequestTrigger{NodeAddress: nodeAddress, Name: name, Id: int64(id)})
 	if err != nil {
 		log.Printf("Client: could not send RequestMetricsFromNode to %v", masterAddress)
 		return err
 	}
 
-	ack, err := stream.Recv()
-	if err != nil {
-		log.Printf("Client: could not recv RequestMetricsFromNode ack from %v", masterAddress)
-		return err
-	}
-
-	log.Printf("Client: on RequestMetricsFromNode service, received %v from master", ack)
+	log.Printf("Client: on RequestMetricsFromNode service, received %v from master", res)
 
 	return nil
 }
