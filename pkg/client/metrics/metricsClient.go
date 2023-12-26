@@ -12,11 +12,11 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-func MetricsRequestFromNodeToMaster(masterAddress string, nodeAddress string, name string, id int64) error {
+func MetricsRequestFromNodeToMaster(fullMasterAddress string, fullNodeAddress string, name string, id int64) error {
 
-	conn, err := grpc.Dial(masterAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(fullMasterAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Printf("Client: could not create dial to %v", masterAddress)
+		log.Printf("Client: could not create dial to %v", fullMasterAddress)
 		return err
 	}
 	defer conn.Close()
@@ -26,9 +26,9 @@ func MetricsRequestFromNodeToMaster(masterAddress string, nodeAddress string, na
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	res, err := client.RequestMetricsFromNode(ctx, &pb.MetricsRequestTrigger{NodeAddress: nodeAddress, Name: name, Id: int64(id)})
+	res, err := client.RequestMetricsFromNode(ctx, &pb.MetricsRequestTrigger{NodeAddress: string(fullNodeAddress), Name: string(name), Id: int64(id)})
 	if err != nil {
-		log.Printf("Client: could not send RequestMetricsFromNode to %v", masterAddress)
+		log.Printf("Client: could not send RequestMetricsFromNode to %v", fullMasterAddress)
 		return err
 	}
 
@@ -39,7 +39,7 @@ func MetricsRequestFromNodeToMaster(masterAddress string, nodeAddress string, na
 
 func RunNodeMetrics(nodeAddress string, name string, id int64, maxRetries int, timeout time.Duration, eachMetrics int) error {
 
-	retires := 0
+	retries := 0
 	for {
 		conn, err := grpc.Dial(nodeAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
@@ -53,12 +53,12 @@ func RunNodeMetrics(nodeAddress string, name string, id int64, maxRetries int, t
 
 		conn.Close()
 
-		retires++
+		retries++
 
 		if metrics == io.EOF {
 			log.Printf("Client: on RequestMetrics service, closing streaming, EOF received from node: %v", nodeAddress) //el nodo ha mandado un eof
 			return nil
-		} else if retires >= maxRetries {
+		} else if retries >= maxRetries {
 			log.Printf("Client: on RequestMetrics service, closing streaming, max retries detected on node: %v with err: %v", nodeAddress, metrics) //se han terminado los retires
 			return nil
 		} else {
@@ -103,7 +103,6 @@ func callMetrics(client pb.MetricServiceClient, id int64, nodeAddress string, na
 					metrics[key] = value
 				}
 				timer = time.NewTimer(timeout)
-				log.Printf("Client: on RequestMetrics service, received a data from %v: %v", name, metrics)
 				aux++
 				if aux == eachMetrics {
 					models.UpdateDatabaseMetrics(nodeAddress, name, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log

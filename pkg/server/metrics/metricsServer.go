@@ -20,9 +20,20 @@ func InitMetricsServer() *metricsServer {
 	return &metricsServer{}
 }
 
+func (s *metricsServer) RequestMetricsFromNode(ctx context.Context, req *pb.MetricsRequestTrigger) (*pb.Ack, error) {
+	log.Printf("Server: on RequestMetricsFromNode service, received MetricsRequestTrigger from nodeAddress: %v name: %v nodeID: %v", req.NodeAddress, req.Name, req.Id)
+	response := &pb.Ack{
+		Ack: string("success"),
+	}
+	go metricsClient.RunNodeMetrics(req.NodeAddress, req.Name, req.Id, 5, 13*time.Second, 15)
+	return response, nil
+}
+
 func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricService_RequestMetricsServer) error {
 
-	log.Printf("Server: MetricsRequest received from nodeID: %v", req.Id)
+	log.Printf("Server: on RequestMetrics service, received  MetricsRequest from nodeID: %v", req.Id)
+
+	retries := 5
 
 	// Create a channel to listen for interrupts
 	interrupt := make(chan os.Signal, 1)
@@ -40,6 +51,8 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 		}
 		close(done)
 	}()
+
+	n_retries := 0
 
 	for {
 
@@ -76,18 +89,27 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 
 			if err := stream.Send(response); err != nil {
 				log.Printf("Server: on RequestMetrics service, Error sending response for metric %s: %v", metrics, err)
-			}
+				n_retries++
+				time.Sleep(5 * time.Second) //se intenta enviar metricas otra vez de4spues de  cada 5s(fibonacci)
+				if n_retries >= retries {
+					go func() {
+						for _, Node := range model.GlobalConfig.Nodes {
+							if Node.Name == "master" {
 
-			time.Sleep(time.Second / 4) //se envian metricas cada 1/4 de segundo
+								err := metricsClient.MetricsRequestFromNodeToMaster(Node.Addr, model.GlobalConfig.FullAddress, model.GlobalConfig.Name, model.GlobalConfig.ID)
+								if err != nil {
+									log.Printf("Client: could not MetricsRequestFromNodeToMaster error %v", err)
+									return
+								}
+							}
+						}
+					}()
+					return err
+				}
+			} else {
+				log.Printf("Server: on RequestMetrics service, send response data from %v to master: %v", model.GlobalConfig.Name, response)
+				time.Sleep(time.Second / 4) //se envian metricas cada 1/4 de segundo
+			}
 		}
 	}
-}
-
-func (s *metricsServer) RequestMetricsFromNode(ctx context.Context, req *pb.MetricsRequestTrigger) (*pb.Ack, error) {
-	log.Printf("Server: on RequestMetricsFromNode service, received MetricsRequestTrigger from nodeAddress: %v name: %v nodeID: %v", req.NodeAddress, req.Name, req.Id)
-	response := &pb.Ack{
-		Ack: string("success"),
-	}
-	go metricsClient.RunNodeMetrics(req.NodeAddress, req.Name, req.Id, 5, 13*time.Second, 15)
-	return response, nil
 }
