@@ -93,13 +93,16 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 				time.Sleep(5 * time.Second) //se intenta enviar metricas otra vez de4spues de  cada 5s(fibonacci)
 				if n_retries >= retries {
 					go func() {
-						for _, Node := range model.GlobalConfig.Nodes {
-							if Node.Name == "master" {
-
-								err := metricsClient.MetricsRequestFromNodeToMaster(Node.Addr, model.GlobalConfig.FullAddress, model.GlobalConfig.Name, model.GlobalConfig.ID)
-								if err != nil {
-									log.Printf("Client: could not MetricsRequestFromNodeToMaster error %v", err)
-									return
+						for {
+							for _, Node := range model.GlobalConfig.Nodes {
+								if Node.Name == "master" {
+									err := metricsClient.MetricsRequestFromNodeToMaster(Node.Addr, model.GlobalConfig.FullAddress, model.GlobalConfig.Name, model.GlobalConfig.ID)
+									if err != nil {
+										log.Printf("Client: could not MetricsRequestFromNodeToMaster error %v", err)
+										time.Sleep(13 * time.Second) //cada 13 segundos si el mensaje no se ha entregado con exito
+									} else {
+										return //si el mensaje llega exitosamente se sale del bucle
+									}
 								}
 							}
 						}

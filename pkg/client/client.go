@@ -8,8 +8,6 @@ import (
 
 func Client() error {
 
-	//if models.GlobalConfig.Name != "master" {
-
 	for _, Node := range models.GlobalConfig.Nodes {
 		if Node.Name == "master" {
 			err := metrics.MetricsRequestFromNodeToMaster(Node.Addr, models.GlobalConfig.FullAddress, models.GlobalConfig.Name, models.GlobalConfig.ID)
@@ -20,6 +18,5 @@ func Client() error {
 		}
 	}
 
-	//}
 	return nil
 }
