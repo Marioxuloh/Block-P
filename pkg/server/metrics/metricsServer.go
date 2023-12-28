@@ -1,6 +1,7 @@
 package MetricsServer
 
 import (
+	client "Block-P/pkg/client"
 	metricsClient "Block-P/pkg/client/metrics"
 	model "Block-P/pkg/models"
 	pb "Block-P/proto" // pakages generated with .proto
@@ -92,21 +93,11 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 				n_retries++
 				time.Sleep(5 * time.Second) //se intenta enviar metricas otra vez de4spues de  cada 5s(fibonacci)
 				if n_retries >= retries {
-					go func() {
-						for {
-							for _, Node := range model.GlobalConfig.Nodes {
-								if Node.Name == "master" {
-									err := metricsClient.MetricsRequestFromNodeToMaster(Node.Addr, model.GlobalConfig.FullAddress, model.GlobalConfig.Name, model.GlobalConfig.ID)
-									if err != nil {
-										log.Printf("Client: could not MetricsRequestFromNodeToMaster error %v", err)
-										time.Sleep(13 * time.Second) //cada 13 segundos si el mensaje no se ha entregado con exito
-									} else {
-										return //si el mensaje llega exitosamente se sale del bucle
-									}
-								}
-							}
-						}
-					}()
+					err := client.Client() //este proceso que es el encargado de hablar con el server invocara un nuevo cliente para establecer otra vez conexion desde 0
+					if err != nil {
+						log.Printf("Server: Client error %v", err)
+						return err
+					}
 					return err
 				}
 			} else {
