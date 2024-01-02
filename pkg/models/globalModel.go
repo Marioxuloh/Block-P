@@ -31,6 +31,8 @@ type Config struct {
 	DashAddress    string
 	FullAddress    string
 	Nodes          []Node
+	RouteAddons    string
+	RouteBlockP    string
 }
 
 var GlobalConfig Config
@@ -44,22 +46,25 @@ func InitGlobalData() error {
 	}
 
 	// Crear la ruta completa del directorio de configuración
-	configDirPath := filepath.Join(homeDir, ".config", "block-p")
+	GlobalConfig.RouteAddons = filepath.Join(homeDir, ".config", "block-p", "addons")
 
 	// Verificar si el directorio de configuración existe
-	if _, err := os.Stat(configDirPath); os.IsNotExist(err) {
+	if _, err := os.Stat(GlobalConfig.RouteAddons); os.IsNotExist(err) {
 		// Si no existe, crear el directorio
-		err := os.MkdirAll(configDirPath, 0755)
+		err := os.MkdirAll(GlobalConfig.RouteAddons, 0755)
 		if err != nil {
 			fmt.Println("Error al crear el directorio de configuración:", err)
 			return err
 		}
 
-		fmt.Printf("Se ha creado el directorio de configuración en: %v\n", configDirPath)
+		fmt.Printf("Se ha creado el directorio de configuración en: %v\n", GlobalConfig.RouteAddons)
 	}
 
+	// mantener ruta a block-p
+	GlobalConfig.RouteBlockP = filepath.Join(homeDir, ".config", "block-p")
+
 	// Crear la ruta completa del archivo de configuración
-	configFilePath := filepath.Join(configDirPath, "config.config")
+	configFilePath := filepath.Join(GlobalConfig.RouteBlockP, "config.config")
 
 	// Verificar si el archivo de configuración existe
 	if _, err := os.Stat(configFilePath); os.IsNotExist(err) {

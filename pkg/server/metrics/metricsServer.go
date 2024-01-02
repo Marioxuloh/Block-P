@@ -77,6 +77,10 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 				disk = "N/A"
 			}
 
+			//GetAddons(), devuelve un map con nombre y respuesta directamente
+			//desde metric.go, se llamara al modelo para que acceda a los archivos.pb y nos devuelva las rutas de los scripts paraejecutalosn metric.go
+			//el odelodevolveraun con nombre y ruta al script
+
 			metrics := map[string]string{
 				"cpu":  cpu,
 				"mem":  mem,
