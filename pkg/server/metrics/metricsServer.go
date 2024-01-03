@@ -81,11 +81,19 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 			//desde metric.go, se llamara al modelo para que acceda a los archivos.pb y nos devuelva las rutas de los scripts paraejecutalosn metric.go
 			//el odelodevolveraun con nombre y ruta al script
 
+			metricsAddons, err := model.GetAddons()
+			if err != nil {
+				log.Printf("Error getting Addons: %v", err)
+				metricsAddons = nil
+			}
+
 			metrics := map[string]string{
 				"cpu":  cpu,
 				"mem":  mem,
 				"disk": disk,
 			}
+
+			metrics = concatMaps(metrics, metricsAddons) //concatenamos los maps
 
 			response := &pb.Data{
 				Id:      model.GlobalConfig.ID,
@@ -110,4 +118,21 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 			}
 		}
 	}
+}
+
+// ConcatenarMapas concatena dos mapas y devuelve un nuevo mapa
+func concatMaps(mapa1, mapa2 map[string]string) map[string]string {
+	resultado := make(map[string]string)
+
+	// Agregar elementos del primer mapa
+	for clave, valor := range mapa1 {
+		resultado[clave] = valor
+	}
+
+	// Agregar elementos del segundo mapa
+	for clave, valor := range mapa2 {
+		resultado[clave] = valor
+	}
+
+	return resultado
 }
