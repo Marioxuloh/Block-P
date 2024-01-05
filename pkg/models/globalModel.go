@@ -33,6 +33,7 @@ type Config struct {
 	Nodes          []Node
 	RouteAddons    string
 	RouteBlockP    string
+	Shell          string
 }
 
 var GlobalConfig Config
@@ -88,6 +89,7 @@ masterMode=true
 secure=false
 name=master
 ip=localhost
+shell=/bin/sh
 
 [nodes]
 
@@ -159,6 +161,8 @@ master=localhost:8080
 					GlobalConfig.Name = value
 				case "ip":
 					GlobalConfig.Ip = value
+				case "shell":
+					GlobalConfig.Shell = value
 				}
 			case "nodes":
 				switch key {

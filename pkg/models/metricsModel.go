@@ -114,7 +114,7 @@ func getArchivesBP(carpeta string) ([]string, error) {
 	return archivos, nil
 }
 func executeScript(scriptPath string) (string, error) {
-	cmd := exec.Command("/bin/sh", scriptPath)
+	cmd := exec.Command(GlobalConfig.Shell, scriptPath)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
