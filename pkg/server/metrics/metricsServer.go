@@ -121,17 +121,17 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 }
 
 // ConcatenarMapas concatena dos mapas y devuelve un nuevo mapa
-func concatMaps(mapa1, mapa2 map[string]string) map[string]string {
+func concatMaps(map1, map2 map[string]string) map[string]string {
 	resultado := make(map[string]string)
 
 	// Agregar elementos del primer mapa
-	for clave, valor := range mapa1 {
-		resultado[clave] = valor
+	for key, value := range map1 {
+		resultado[key] = value
 	}
 
 	// Agregar elementos del segundo mapa
-	for clave, valor := range mapa2 {
-		resultado[clave] = valor
+	for key, value := range map2 {
+		resultado[key] = value
 	}
 
 	return resultado
