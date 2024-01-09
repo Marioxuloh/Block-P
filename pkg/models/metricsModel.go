@@ -84,6 +84,7 @@ func GetAddons() (map[string]string, error) {
 		output, err := executeScript(routeScript)
 		if err != nil {
 			log.Fatal("Error executing script:", err)
+			continue //salta al siguiente .bp
 		}
 
 		metricsAddons[name] = output
