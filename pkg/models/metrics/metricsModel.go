@@ -1,6 +1,8 @@
-package Model
+package ModelMetrics
 
 import (
+	websocket "Block-P/cmd/dashboard/controllers/webSockets"
+	model "Block-P/pkg/models"
 	"bufio"
 	"log"
 	"os"
@@ -19,13 +21,29 @@ func UpdateDatabaseMetrics(nodeAddress string, name string, metrics map[string]s
 }
 
 func UpdateDashboardMetrics(nodeAddress string, name string, metrics map[string]string) {
-	//LLAMAR al controlador
+	// Añade nodeAddress y name al mapa de métricas
+	metrics["nodeAddress"] = nodeAddress
+	metrics["name"] = name
+
+	// Construye un mapa con la información completa
+	data := map[string]interface{}{
+		"nodeAddress": nodeAddress,
+		"name":        name,
+		"metrics":     metrics,
+	}
+
+	// Envia el mapa a través del websocket
+	err := websocket.SendMap(data)
+	if err != nil {
+		log.Printf("Error sending map by websockets: ", err)
+		// Puedes manejar el error según tus necesidades
+	}
 }
 
 func GetAddons() (map[string]string, error) {
 	//buscar todos los .bp y ejecutar los scripts, devolver map
 	//obtener la lista de archivos *.bp
-	archives, err := getArchivesBP(GlobalConfig.RouteAddons)
+	archives, err := getArchivesBP(model.GlobalConfig.RouteAddons)
 
 	if err != nil {
 		log.Println("Error Model:", err)
@@ -115,7 +133,7 @@ func getArchivesBP(carpeta string) ([]string, error) {
 	return archivos, nil
 }
 func executeScript(scriptPath string) (string, error) {
-	cmd := exec.Command(GlobalConfig.Shell, scriptPath)
+	cmd := exec.Command(model.GlobalConfig.Shell, scriptPath)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {

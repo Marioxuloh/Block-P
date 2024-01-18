@@ -4,6 +4,7 @@ import (
 	client "Block-P/pkg/client"
 	metricsClient "Block-P/pkg/client/metrics"
 	model "Block-P/pkg/models"
+	modelMetrics "Block-P/pkg/models/metrics"
 	pb "Block-P/proto" // pakages generated with .proto
 	"context"
 	"log"
@@ -81,7 +82,7 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 			//desde metric.go, se llamara al modelo para que acceda a los archivos.pb y nos devuelva las rutas de los scripts paraejecutalosn metric.go
 			//el odelodevolveraun con nombre y ruta al script
 
-			metricsAddons, err := model.GetAddons()
+			metricsAddons, err := modelMetrics.GetAddons()
 			if err != nil {
 				log.Printf("Error getting Addons: %v", err)
 				metricsAddons = nil

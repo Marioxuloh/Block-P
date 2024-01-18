@@ -1,7 +1,7 @@
 package MetricsClient
 
 import (
-	models "Block-P/pkg/models"
+	modelMetrics "Block-P/pkg/models/metrics"
 	pb "Block-P/proto"
 	"context"
 	"io"
@@ -105,10 +105,10 @@ func callMetrics(client pb.MetricServiceClient, id int64, nodeAddress string, na
 				timer = time.NewTimer(timeout)
 				aux++
 				if aux == eachMetrics {
-					models.UpdateDatabaseMetrics(nodeAddress, name, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log
+					modelMetrics.UpdateDatabaseMetrics(nodeAddress, name, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log
 					aux = 0
 				}
-				models.UpdateDashboardMetrics(nodeAddress, name, metrics) //cada 1/4s
+				modelMetrics.UpdateDashboardMetrics(nodeAddress, name, metrics) //cada 1/4s
 			}
 		}()
 	}

@@ -23,6 +23,7 @@ func Dashboard() error {
 
 	mux.HandleFunc("/", handleStatic)
 
+	log.Printf("Initializing dashboard server on :%s", model.GlobalConfig.DashAddress)
 	if err := http.ListenAndServe(model.GlobalConfig.DashAddress, mux); err != nil {
 		log.Println("server failed:", err)
 		return err

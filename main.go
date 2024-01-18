@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	dashboard "Block-P/cmd/dashboard"
+	websocket "Block-P/cmd/dashboard/controllers/webSockets"
 	client "Block-P/pkg/client"
 	model "Block-P/pkg/models"
 	server "Block-P/pkg/server"
@@ -53,6 +54,16 @@ func main() {
 
 	if model.GlobalConfig.MasterMode == true {
 		//dashboard, desplegamos unh dashboard para visualizar los nodos, su informacion y poder inyectar codigo en ellos para utilizarlos como microservicios, solo para master
+		//websocket, inicializamos el websocket para comunicarnos en tiempo real con el dashboard
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			err := websocket.WebSocketInit()
+			if err != nil {
+				log.Printf("Main: websocket error %v", err)
+				return
+			}
+		}()
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

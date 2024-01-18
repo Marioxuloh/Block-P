@@ -17,23 +17,25 @@ type Node struct {
 
 // config
 type Config struct {
-	Port           int
-	DashPort       int
-	Protocol       string
-	MaxConnections int
-	DebugMode      bool
-	ID             int64
-	MasterMode     bool
-	Secure         bool
-	Name           string
-	Ip             string
-	PortAddress    string
-	DashAddress    string
-	FullAddress    string
-	Nodes          []Node
-	RouteAddons    string
-	RouteBlockP    string
-	Shell          string
+	Port             int
+	DashPort         int
+	WebSocketPort    int
+	Protocol         string
+	MaxConnections   int
+	DebugMode        bool
+	ID               int64
+	MasterMode       bool
+	Secure           bool
+	Name             string
+	Ip               string
+	PortAddress      string
+	DashAddress      string
+	WebSocketAddress string
+	FullAddress      string
+	Nodes            []Node
+	RouteAddons      string
+	RouteBlockP      string
+	Shell            string
 }
 
 var GlobalConfig Config
@@ -81,6 +83,7 @@ func InitGlobalData() error {
 
 port=8080
 dashPort=8081
+webSocketPort=8082
 protocol=tcp
 maxConnections=100
 debugMode=true
@@ -145,6 +148,8 @@ master=localhost:8080
 					fmt.Sscanf(value, "%d", &GlobalConfig.Port)
 				case "dashPort":
 					fmt.Sscanf(value, "%d", &GlobalConfig.DashPort)
+				case "webSocketPort":
+					fmt.Sscanf(value, "%d", &GlobalConfig.WebSocketPort)
 				case "protocol":
 					GlobalConfig.Protocol = value
 				case "maxConnections":
@@ -184,6 +189,7 @@ master=localhost:8080
 
 	GlobalConfig.PortAddress = ":" + strconv.Itoa(GlobalConfig.Port)
 	GlobalConfig.DashAddress = ":" + strconv.Itoa(GlobalConfig.DashPort)
+	GlobalConfig.WebSocketAddress = ":" + strconv.Itoa(GlobalConfig.WebSocketPort)
 	GlobalConfig.FullAddress = GlobalConfig.Ip + ":" + strconv.Itoa(GlobalConfig.Port)
 
 	return nil
