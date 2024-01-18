@@ -9,6 +9,7 @@ import (
 
 // SendMap envía un mapa a través de la conexión websocket.
 func SendMap(data map[string]interface{}) error {
+
 	if conn == nil {
 		return fmt.Errorf("websocket conexion not stablished")
 	}

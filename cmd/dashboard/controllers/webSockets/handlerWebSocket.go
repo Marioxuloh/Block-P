@@ -7,31 +7,32 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+var (
+	conn *websocket.Conn
+)
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
 
-var conn *websocket.Conn
-
+// WebSocketHandler maneja las conexiones WebSocket
 func handleWebSocket(w http.ResponseWriter, r *http.Request) {
-	var err error
-	conn, err = upgrader.Upgrade(w, r, nil)
+	// Configura el Upgrader para permitir la conexión desde el mismo origen
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		return true
+	}
+
+	// Actualiza la conexión HTTP a una conexión WebSocket
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("Error updating conexion: %v", err)
+		log.Printf("Error al actualizar la conexión: %v", err)
 		return
 	}
 	defer conn.Close()
 
-	log.Printf("Client websocket connected")
+	log.Printf("Cliente WebSocket conectado")
 
-	for {
-		// Maneja los mensajes del cliente si es necesario
-		// se mantiene eternamente hasta que el cliente cierra la conexion
-		_, _, err := conn.ReadMessage()
-		if err != nil {
-			log.Printf("Client websocket disconnected")
-			break
-		}
-	}
+	// Simplemente espera hasta que se cierre la conexión
+	select {}
 }

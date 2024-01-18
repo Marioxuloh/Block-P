@@ -60,7 +60,7 @@ func main() {
 			defer wg.Done()
 			err := websocket.WebSocketInit()
 			if err != nil {
-				log.Printf("Main: websocket error %v", err)
+				log.Printf("Main: Websocket error %v", err)
 				return
 			}
 		}()
