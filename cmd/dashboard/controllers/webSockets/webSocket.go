@@ -13,7 +13,7 @@ func WebSocketInit() error {
 	log.Printf("Initializing websocket server on :%s", model.GlobalConfig.WebSocketAddress)
 	err := http.ListenAndServe(model.GlobalConfig.WebSocketAddress, nil)
 	if err != nil {
-		log.Printf("Error listen and serve websocket :", err)
+		log.Printf("Error listen and serve websocket: %v", err)
 		return err
 	}
 	return nil

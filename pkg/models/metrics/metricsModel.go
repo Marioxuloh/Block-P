@@ -35,7 +35,7 @@ func UpdateDashboardMetrics(nodeAddress string, name string, metrics map[string]
 	// Envia el mapa a través del websocket
 	err := websocket.SendMap(data)
 	if err != nil {
-		log.Printf("Error sending map by websockets: ", err)
+		log.Printf("Error sending map by websockets: %v", err)
 		// Puedes manejar el error según tus necesidades
 	}
 }
