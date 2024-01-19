@@ -21,9 +21,6 @@ func UpdateDatabaseMetrics(nodeAddress string, name string, metrics map[string]s
 }
 
 func UpdateDashboardMetrics(nodeAddress string, name string, metrics map[string]string) {
-	// Añade nodeAddress y name al mapa de métricas
-	metrics["nodeAddress"] = nodeAddress
-	metrics["name"] = name
 
 	// Construye un mapa con la información completa
 	data := map[string]interface{}{

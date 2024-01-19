@@ -30,7 +30,7 @@ func main() {
 	//cierre ordenado
 	var wg sync.WaitGroup
 
-	//servidor, gestionamos todas las llamadas entrantes
+	//servidor, gestionamos todas las llamadas entrantes, si es master espera a que se establezca la conexion websocket(llamamos al cliente y este hace que se envien cosas por websockets)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -41,7 +41,7 @@ func main() {
 		}
 	}()
 
-	//cliente, gestionamos todos los mensajes que vamos a enviar: requestMetrics(), demomento solo para master
+	//cliente, gestionamos todos los mensajes que vamos a enviar: requestMetrics(), si es master espera a que se establezca la conexion websocket(en el cliente enviamos mensajes)
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -53,7 +53,6 @@ func main() {
 	}()
 
 	if model.GlobalConfig.MasterMode == true {
-		//dashboard, desplegamos unh dashboard para visualizar los nodos, su informacion y poder inyectar codigo en ellos para utilizarlos como microservicios, solo para master
 		//websocket, inicializamos el websocket para comunicarnos en tiempo real con el dashboard
 		wg.Add(1)
 		go func() {
@@ -64,6 +63,7 @@ func main() {
 				return
 			}
 		}()
+		//dashboard, desplegamos unh dashboard para visualizar los nodos, su informacion y poder inyectar codigo en ellos para utilizarlos como microservicios, solo para master
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
