@@ -1,6 +1,6 @@
 module Block-P
 
-go 1.21.4
+go 1.23
 
 require (
 	google.golang.org/grpc v1.59.0

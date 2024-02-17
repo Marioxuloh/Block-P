@@ -62,21 +62,6 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 		case <-done:
 			return nil
 		default:
-			cpu, err := getCPU()
-			if err != nil {
-				log.Printf("Error getting CPU usage: %v", err)
-				cpu = "N/A"
-			}
-			mem, err := getMEM()
-			if err != nil {
-				log.Printf("Error getting MEM usage: %v", err)
-				mem = "N/A"
-			}
-			disk, err := getDISK()
-			if err != nil {
-				log.Printf("Error getting DISK usage: %v", err)
-				disk = "N/A"
-			}
 
 			//GetAddons(), devuelve un map con nombre y respuesta directamente
 			//desde metric.go, se llamara al modelo para que acceda a los archivos.pb y nos devuelva las rutas de los scripts paraejecutalosn metric.go
@@ -88,21 +73,13 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 				metricsAddons = nil
 			}
 
-			metrics := map[string]string{
-				"cpu":  cpu,
-				"mem":  mem,
-				"disk": disk,
-			}
-
-			metrics = concatMaps(metrics, metricsAddons) //concatenamos los maps
-
 			response := &pb.Data{
 				Id:      model.GlobalConfig.ID,
-				Metrics: metrics,
+				Metrics: metricsAddons,
 			}
 
 			if err := stream.Send(response); err != nil {
-				log.Printf("Server: on RequestMetrics service, Error sending response for metric %s: %v", metrics, err)
+				log.Printf("Server: on RequestMetrics service, Error sending response for metric %s: %v", metricsAddons, err)
 				n_retries++
 				time.Sleep(5 * time.Second) //se intenta enviar metricas otra vez de4spues de  cada 5s(fibonacci)
 				if n_retries >= retries {
