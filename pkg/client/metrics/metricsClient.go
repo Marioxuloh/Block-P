@@ -39,7 +39,6 @@ func MetricsRequestFromNodeToMaster(fullMasterAddress string, fullNodeAddress st
 
 func RunNodeMetrics(nodeAddress string, name string, id int64, maxRetries int, timeout time.Duration, eachMetrics int) error {
 
-	retries := 0
 	for {
 		conn, err := grpc.Dial(nodeAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
@@ -53,16 +52,12 @@ func RunNodeMetrics(nodeAddress string, name string, id int64, maxRetries int, t
 
 		conn.Close()
 
-		retries++
-
 		if metrics == io.EOF {
 			log.Printf("Client: on RequestMetrics service, closing streaming, EOF received from node: %v", nodeAddress) //el nodo ha mandado un eof
 			return nil
-		} else if retries >= maxRetries {
-			log.Printf("Client: on RequestMetrics service, closing streaming, max retries detected on node: %v with err: %v", nodeAddress, metrics) //se han terminado los retires
+		} else if metrics != nil {
+			log.Printf("Client: on RequestMetrics service, closing streaming, err received from node: %v", nodeAddress) //el nodo ha mandado un eof
 			return nil
-		} else {
-			log.Printf("Client: on RequestMetrics service, retrying connect to node: %v with err: %v", nodeAddress, metrics) //retrying connect
 		}
 
 	}
@@ -95,8 +90,7 @@ func callMetrics(client pb.MetricServiceClient, id int64, nodeAddress string, na
 				}
 				if err != nil {
 					log.Printf("Client: on RequestMetrics service, could not Recv, error while streaming, retrying connect in timeout: %d err: %v", timeout, err)
-					response = err //salimos y volvemos a intentar conectar pasados 13s
-					timer = time.NewTimer(timeout)
+					response = err //salimos totalmente y no volvemos a intentar conectar
 					break
 				}
 				for key, value := range data.Metrics {

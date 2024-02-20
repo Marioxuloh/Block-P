@@ -35,8 +35,6 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 
 	log.Printf("Server: on RequestMetrics service, received  MetricsRequest from nodeID: %v", req.Id)
 
-	retries := 5
-
 	// Create a channel to listen for interrupts
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
@@ -53,8 +51,6 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 		}
 		close(done)
 	}()
-
-	n_retries := 0
 
 	for {
 
@@ -80,16 +76,13 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 
 			if err := stream.Send(response); err != nil {
 				log.Printf("Server: on RequestMetrics service, Error sending response for metric %s: %v", metricsAddons, err)
-				n_retries++
-				time.Sleep(5 * time.Second) //se intenta enviar metricas otra vez de4spues de  cada 5s(fibonacci)
-				if n_retries >= retries {
-					err := client.Client() //este proceso que es el encargado de hablar con el server invocara un nuevo cliente para establecer otra vez conexion desde 0
-					if err != nil {
-						log.Printf("Server: Client error %v", err)
-						return err
-					}
+				err := client.Client() //este proceso que es el encargado de hablar con el server invocara un nuevo cliente para establecer otra vez conexion desde 0
+				if err != nil {
+					log.Printf("Server: Client error %v", err) //si no consigue establecer conexion
 					return err
 				}
+				return err //si consigue establecer conexion tambien acaba
+
 			} else {
 				log.Printf("Server: on RequestMetrics service, send response data from %v to master: %v", model.GlobalConfig.Name, response)
 				time.Sleep(time.Second / 4) //se envian metricas cada 1/4 de segundo
