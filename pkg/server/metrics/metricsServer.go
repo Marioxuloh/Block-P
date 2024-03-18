@@ -82,7 +82,6 @@ func (s *metricsServer) RequestMetrics(req *pb.MetricsRequest, stream pb.MetricS
 					return err
 				}
 				return err //si consigue establecer conexion tambien acaba
-
 			} else {
 				log.Printf("Server: on RequestMetrics service, send response data from %v to master: %v", model.GlobalConfig.Name, response)
 				time.Sleep(time.Second / 4) //se envian metricas cada 1/4 de segundo
