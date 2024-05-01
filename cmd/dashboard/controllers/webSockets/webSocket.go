@@ -15,7 +15,7 @@ func WebSocketInit() error {
 	// Configura CORS con opciones detalladas
 	headers := handlers.AllowedHeaders([]string{"*"})
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"})
-	origins := handlers.AllowedOrigins([]string{"http://localhost:8081"})
+	origins := handlers.AllowedOrigins([]string{"http://" + model.GlobalConfig.DashAddress})
 	handler := handlers.CORS(headers, methods, origins)(http.DefaultServeMux)
 
 	log.Printf("Initializing websocket server on :%s", model.GlobalConfig.WebSocketAddress)
