@@ -56,7 +56,7 @@ func RunNodeMetrics(nodeAddress string, name string, id int64, maxRetries int, t
 			log.Printf("Client: on RequestMetrics service, closing streaming, EOF received from node: %v", nodeAddress) //el nodo ha mandado un eof
 			return nil
 		} else if metrics != nil {
-			log.Printf("Client: on RequestMetrics service, closing streaming, err received from node: %v", nodeAddress) //el nodo ha mandado un eof
+			log.Printf("Client: on RequestMetrics service, closing streaming, err received from node: %v", nodeAddress) //el nodo ha mandado un err
 			return nil
 		}
 
