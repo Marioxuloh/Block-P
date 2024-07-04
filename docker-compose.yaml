@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  master:
+    build:
+      context: .
+      dockerfile: Dockerfile.master
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+    networks:
+      - block-net
+
+  worker1:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    networks:
+      - block-net
+
+  worker2:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    networks:
+      - block-net
+
+networks:
+  block-net:
+    driver: bridge
