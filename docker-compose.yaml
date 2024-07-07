@@ -5,27 +5,39 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.master
+    volumes:
+      - /Users/marioxuloh/Documents/VSCode/Block-P/config/masterConfig:/root/.config/block-p
     ports:
       - "8080:8080"
       - "8081:8081"
       - "8082:8082"
     networks:
-      - block-net
+      block-net:
+        ipv4_address: 172.28.0.2
 
   worker1:
     build:
       context: .
       dockerfile: Dockerfile.worker
+    volumes:
+      - /Users/marioxuloh/Documents/VSCode/Block-P/config/worker1Config:/root/.config/block-p
     networks:
-      - block-net
+      block-net:
+        ipv4_address: 172.28.0.3
 
   worker2:
     build:
       context: .
       dockerfile: Dockerfile.worker
+    volumes:
+      - /Users/marioxuloh/Documents/VSCode/Block-P/config/worker2Config:/root/.config/block-p
     networks:
-      - block-net
+      block-net:
+        ipv4_address: 172.28.0.4
 
 networks:
   block-net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

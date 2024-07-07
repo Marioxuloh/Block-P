@@ -17,8 +17,8 @@ COPY . .
 # Build the Go app
 RUN go build -o app
 
-# Expose the port on which the Go app will run
-EXPOSE 8080
+# create directory of config
+RUN mkdir -p /root/.config/block-p
 
 # Command to run the executable
 CMD ["./app"]
