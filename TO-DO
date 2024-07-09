@@ -1,4 +1,8 @@
-[] crear network con dokker para pruebas
-[] porbarlo con kla network de dokker
+[x] crear network con dokker para pruebas
+[x] porbarlo con kla network de dokker
+[x] arreglar concurrencia de websockets
+[] refactorizacion de codigo y el cambio de algunos datos de config redundantes 
+[] cambiar alguna cosa del funcionamiento de como se habla con los nodos etc etc
+[] crear capa persistente
 [] mockup explicando datos 
 [] vistas y detallando lo que se quiere en cada una
