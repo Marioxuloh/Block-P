@@ -3,6 +3,7 @@ package websockets
 import (
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -12,7 +13,10 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-var conn *websocket.Conn
+var (
+	mu   sync.Mutex
+	conn *websocket.Conn
+)
 
 // WebSocketHandler maneja las conexiones WebSocket
 func handleWebSocket(w http.ResponseWriter, r *http.Request) {

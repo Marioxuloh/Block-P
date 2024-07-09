@@ -18,6 +18,9 @@ func SendMap(data map[string]interface{}) error {
 		return err
 	}
 
+	// se crea la seccion critica para escribir el mensaje en el websocket
+	mu.Lock()
+	defer mu.Unlock()
 	err = conn.WriteMessage(websocket.TextMessage, jsonData)
 	if err != nil {
 		return err

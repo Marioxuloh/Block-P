@@ -99,10 +99,10 @@ func callMetrics(client pb.MetricServiceClient, id int64, nodeAddress string, na
 				timer = time.NewTimer(timeout)
 				aux++
 				if aux == eachMetrics {
-					modelMetrics.UpdateDatabaseMetrics(nodeAddress, name, metrics) //esto cada 5s como fibonacci, si cada 1/4s llega un metrics cada 15 metrics uno se guarda en el log
+					modelMetrics.UpdateDatabaseMetrics(nodeAddress, name, metrics) //esto cada 15s como fibonacci, si cada 1s llega un metrics cada 15 metrics uno se guarda en el log
 					aux = 0
 				}
-				modelMetrics.UpdateDashboardMetrics(nodeAddress, name, metrics) //cada 1/4s
+				modelMetrics.UpdateDashboardMetrics(nodeAddress, name, metrics) //cada 1s
 			}
 		}()
 	}
