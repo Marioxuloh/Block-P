@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func UpdateDatabaseMetrics(nodeAddress string, name string, metrics map[string]string) {
+func UpdateDatabaseMetrics(nodeAddress string, id int64, name string, metrics map[string]string) {
 	// Lógica para actualizar la base de datos de las métricas de un nodo, en este caso, el estado de conexión.
 	// Puedes acceder a los elementos del mapa dentro de la función.
 	//for key, value := range metrics {
@@ -20,11 +20,12 @@ func UpdateDatabaseMetrics(nodeAddress string, name string, metrics map[string]s
 	//}
 }
 
-func UpdateDashboardMetrics(nodeAddress string, name string, metrics map[string]string) {
+func UpdateDashboardMetrics(nodeAddress string, id int64, name string, metrics map[string]string) {
 
 	// Construye un mapa con la información completa
 	data := map[string]interface{}{
 		"nodeAddress": nodeAddress,
+		"id":          id,
 		"name":        name,
 		"metrics":     metrics,
 	}
